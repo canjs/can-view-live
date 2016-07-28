@@ -121,7 +121,7 @@ test('list', function () {
 			'bear'
 		]),
 		template = function (animal) {
-			return '<label>Animal=</label> <span>' + animal + '</span>';
+			return '<label>Animal=</label> <span>' + animal() + '</span>';
 		};
 	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
@@ -142,7 +142,7 @@ test('list with a compute', function () {
 			]
 		}),
 		template = function (animal) {
-			return '<label>Animal=</label> <span>' + animal + '</span>';
+			return '<label>Animal=</label> <span>' + animal() + '</span>';
 		};
 	var listCompute = compute(function () {
 		return map.attr('animals');
@@ -359,7 +359,7 @@ test('rendered list items should re-render when updated (#2007)', function () {
 	var placeholderElement = document.createElement('span');
 	var list = new List([ 'foo' ]);
 	var renderer = function(item) {
-		return '<span>' + item + '</span>';
+		return '<span>' + item() + '</span>';
 	};
 
 	partial.appendChild(placeholderElement);
