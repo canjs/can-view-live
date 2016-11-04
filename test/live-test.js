@@ -194,9 +194,7 @@ test('list with a compute that returns a list', function () {
 	equal(spans.length, 3, 'there are 3 spans');
 });
 test('text binding is memory safe (#666)', function () {
-	for(var prop in nodeLists.nodeMap) {
-		delete nodeLists.nodeMap[prop];
-	}
+	nodeLists.nodeMap.clear();
 
 	var div = document.createElement('div'),
 		span = document.createElement('span'),
@@ -211,7 +209,7 @@ test('text binding is memory safe (#666)', function () {
 	domMutate.removeChild.call(this.fixture, div);
 	stop();
 	setTimeout(function () {
-		ok(isEmptyObject(nodeLists.nodeMap), 'nothing in nodeMap');
+		ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
 		start();
 	}, 100);
 });
