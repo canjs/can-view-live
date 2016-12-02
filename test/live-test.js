@@ -3,6 +3,7 @@ var compute = require('can-compute');
 var Map = require('can-map');
 var List = require('can-list');
 var nodeLists = require('can-view-nodelist');
+var canBatch = require('can-event/batch/batch');
 
 var QUnit = require('steal-qunit');
 
@@ -373,4 +374,32 @@ test('rendered list items should re-render when updated (#2007)', function () {
 	list.attr(0, 'baz');
 
 	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'baz', 'list item 0 is baz');
+});
+
+test('list items should be correct even if renderer flushes batch (#8)', function () {
+	var partial = document.createElement('div');
+	var placeholderElement = document.createElement('span');
+	var list = new List([ 'one', 'two' ]);
+	var renderer = function(item) {
+		// batches can be flushed in renderers (such as those using helpers like `#each`)
+		canBatch.flush();
+		return '<span>' + item() + '</span>';
+	};
+
+	partial.appendChild(placeholderElement);
+
+	live.list(placeholderElement, list, renderer, {});
+
+	equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
+	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'one', 'list item 0 is "one"');
+	equal(partial.getElementsByTagName('span')[1].firstChild.data, 'two', 'list item 1 is "two"');
+
+	canBatch.start();
+	list.splice(0, 0, 'three');
+	list.splice(2, 1);
+	canBatch.stop();
+
+	equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
+	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'three', 'list item 0 is "three"');
+	equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
 });
