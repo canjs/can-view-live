@@ -49,8 +49,8 @@
   "dependencies": {
     "can-compute": "^3.0.0",
     "can-event": "^3.0.1",
-    "can-types": "^0.1.0",
-    "can-util": "^3.0.6",
+    "can-types": "^1.0.1",
+    "can-util": "^3.1.1",
     "can-view-callbacks": "^3.0.0",
     "can-view-nodelist": "^3.0.1",
     "can-view-parser": "^3.0.0",
