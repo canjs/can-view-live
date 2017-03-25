@@ -4,6 +4,7 @@ var Map = require('can-map');
 var List = require('can-list');
 var nodeLists = require('can-view-nodelist');
 var canBatch = require('can-event/batch/batch');
+var Observation = require("can-observation");
 
 var QUnit = require('steal-qunit');
 
@@ -134,7 +135,7 @@ test('list', function () {
 	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
 	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
 });
-test('list with a compute', function () {
+test('list within a compute', function () {
 	var div = document.createElement('div'),
 		map = new Map({
 			animals: [
@@ -402,4 +403,65 @@ test('list items should be correct even if renderer flushes batch (#8)', functio
 	equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
 	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'three', 'list item 0 is "three"');
 	equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
+});
+
+QUnit.test("Works with Observations - .html", function(){
+	var div = document.createElement('div'),
+		span = document.createElement('span');
+	div.appendChild(span);
+	var items = new List([
+		'one',
+		'two'
+	]);
+	var html = new Observation(function () {
+		var html = '';
+		items.each(function (item) {
+			html += '<label>' + item + '</label>';
+		});
+		return html;
+	});
+	live.html(span, html, div);
+	equal(div.getElementsByTagName('label')
+		.length, 2);
+	items.push('three');
+	equal(div.getElementsByTagName('label')
+		.length, 3);
+});
+
+
+QUnit.test('Works with Observations - .list', function () {
+	var div = document.createElement('div'),
+		map = new Map({
+			animals: [
+				'bear',
+				'turtle'
+			]
+		}),
+		template = function (animal) {
+			return '<label>Animal=</label> <span>' + animal() + '</span>';
+		};
+	var listObservation = new Observation(function () {
+		return map.attr('animals');
+	});
+	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
+	var el = div.getElementsByTagName('span')[0];
+	live.list(el, listObservation, template, {});
+	equal(div.getElementsByTagName('label')
+		.length, 2, 'There are 2 labels');
+	div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
+
+	map.attr('animals')
+		.push('turtle');
+
+	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
+	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
+
+	map.attr('animals', new List([
+		'sloth',
+		'bear',
+		'turtle'
+	]));
+	var spans = div.getElementsByTagName('span');
+	equal(spans.length, 3, 'there are 3 spans');
+	ok(!div.getElementsByTagName('label')[0].myexpando, 'no expando');
 });
