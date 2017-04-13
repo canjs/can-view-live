@@ -97,7 +97,7 @@ test('attribute', function () {
 	});
 	var className = compute(function(){
 		return "foo "+first() + " "+ second()+" end";
-	})
+	});
 
 	live.attr(div, 'class', className);
 
@@ -123,7 +123,7 @@ test('list', function () {
 			'bear'
 		]),
 		template = function (animal) {
-			return '<label>Animal=</label> <span>' + animal() + '</span>';
+			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
 		};
 	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
@@ -144,7 +144,7 @@ test('list within a compute', function () {
 			]
 		}),
 		template = function (animal) {
-			return '<label>Animal=</label> <span>' + animal() + '</span>';
+			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
 		};
 	var listCompute = compute(function () {
 		return map.attr('animals');
@@ -359,7 +359,7 @@ test('rendered list items should re-render when updated (#2007)', function () {
 	var placeholderElement = document.createElement('span');
 	var list = new List([ 'foo' ]);
 	var renderer = function(item) {
-		return '<span>' + item() + '</span>';
+		return '<span>' + item.get() + '</span>';
 	};
 
 	partial.appendChild(placeholderElement);
@@ -384,7 +384,7 @@ test('list items should be correct even if renderer flushes batch (#8)', functio
 	var renderer = function(item) {
 		// batches can be flushed in renderers (such as those using helpers like `#each`)
 		canBatch.flush();
-		return '<span>' + item() + '</span>';
+		return '<span>' + item.get() + '</span>';
 	};
 
 	partial.appendChild(placeholderElement);
@@ -438,7 +438,7 @@ QUnit.test('Works with Observations - .list', function () {
 			]
 		}),
 		template = function (animal) {
-			return '<label>Animal=</label> <span>' + animal() + '</span>';
+			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
 		};
 	var listObservation = new Observation(function () {
 		return map.attr('animals');
@@ -465,3 +465,52 @@ QUnit.test('Works with Observations - .list', function () {
 	equal(spans.length, 3, 'there are 3 spans');
 	ok(!div.getElementsByTagName('label')[0].myexpando, 'no expando');
 });
+
+QUnit.test('Works with Observations - .attrs', function () {
+	var div = document.createElement('div');
+	var items = new List([
+		'class',
+		'foo'
+	]);
+	var text = new Observation(function () {
+		var html = '';
+		if (items.attr(0) && items.attr(1)) {
+			html += items.attr(0) + '=\'' + items.attr(1) + '\'';
+		}
+		return html;
+	});
+	live.attrs(div, text);
+	equal(div.className, 'foo');
+	items.splice(0, 2);
+	equal(div.className, '');
+	items.push('foo', 'bar');
+	equal(div.getAttribute('foo'), 'bar');
+});
+
+QUnit.test('Works with Observations - .attr', function(){
+	var div = document.createElement('div');
+
+	var firstObject = new Map({});
+
+	var first = compute(function () {
+		return firstObject.attr('selected') ? 'selected' : '';
+	});
+
+	var secondObject = new Map({});
+	var second = compute(function () {
+		return secondObject.attr('active') ? 'active' : '';
+	});
+	var className = new Observation(function(){
+		return "foo "+first() + " "+ second()+" end";
+	});
+
+	live.attr(div, 'class', className);
+
+	equal(div.className, 'foo   end');
+	firstObject.attr('selected', true);
+	equal(div.className, 'foo selected  end');
+	secondObject.attr('active', true);
+	equal(div.className, 'foo selected active end');
+	firstObject.attr('selected', false);
+	equal(div.className, 'foo  active end');
+})
