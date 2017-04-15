@@ -403,3 +403,71 @@ test('list items should be correct even if renderer flushes batch (#8)', functio
 	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'three', 'list item 0 is "three"');
 	equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
 });
+
+test('live.html compute bindings are removed when parent nodeList is unregistered', function() {
+	var frag = document.createDocumentFragment(),
+		parentNode = document.createTextNode(''),
+		parentNodeList = nodeLists.register([ parentNode ], null, true, false);
+	frag.appendChild(parentNode);
+
+	var div = document.createElement('div'),
+		placeholder = document.createTextNode('');
+	div.appendChild(placeholder);
+
+	var htmlCompute = compute(function(){
+		return "<h1>Hello World</h1>";
+	});
+
+	live.html(placeholder, htmlCompute, div, parentNodeList);
+
+	nodeLists.unregister(parentNodeList);
+
+	equal(htmlCompute.computeInstance.__bindEvents._lifecycleBindings, 0, 'bindings are removed');
+});
+
+test('live.attr compute bindings are removed when parent nodeList is unregistered', function() {
+	var frag = document.createDocumentFragment(),
+		parentNode = document.createTextNode(''),
+		parentNodeList = nodeLists.register([ parentNode ], null, true, false);
+	frag.appendChild(parentNode);
+
+	var div = document.createElement('div');
+
+	var classCompute = compute(function(){
+		return "hello-class";
+	});
+
+	live.attr(div, "class", classCompute, parentNodeList);
+
+	nodeLists.unregister(parentNodeList);
+
+	equal(classCompute.computeInstance.__bindEvents._lifecycleBindings, 0, 'bindings are removed');
+});
+
+test('live.html and live.attr compute bindings are removed when parent nodeList is unregistered', function() {
+	var frag = document.createDocumentFragment(),
+		parentNode = document.createTextNode(''),
+		parentNodeList = nodeLists.register([ parentNode ], null, true, false);
+	frag.appendChild(parentNode);
+
+	var div = document.createElement('div'),
+		placeholder = document.createTextNode('');
+	div.appendChild(placeholder);
+
+	var classCompute = compute(function(){
+		return "hello-class";
+	});
+
+	live.attr(div, "class", classCompute, parentNodeList);
+
+	var htmlCompute = compute(function(){
+		return "<h1>Hello World</h1>";
+	});
+
+	live.html(placeholder, htmlCompute, div, parentNodeList);
+
+	nodeLists.unregister(parentNodeList);
+
+	equal(htmlCompute.computeInstance.__bindEvents._lifecycleBindings, 0, 'html bindings are removed');
+	equal(classCompute.computeInstance.__bindEvents._lifecycleBindings, 0, 'attr bindings are removed');
+});
