@@ -4,6 +4,7 @@ var Map = require('can-map');
 var List = require('can-list');
 var nodeLists = require('can-view-nodelist');
 var canBatch = require('can-event/batch/batch');
+var domEvents = require('can-util/dom/events/events');
 
 var QUnit = require('steal-qunit');
 
@@ -17,6 +18,7 @@ QUnit.module('can-view-live',{
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });
+
 test('html', function () {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
@@ -43,6 +45,7 @@ var esc = function (str) {
 	return str.replace(/</g, '&lt;')
 		.replace(/>/g, '&gt;');
 };
+
 test('text', function () {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
@@ -63,6 +66,7 @@ test('text', function () {
 	items.push('three');
 	equal(div.innerHTML, esc('<label>one</label><label>two</label><label>three</label>'));
 });
+
 test('attributes', function () {
 	var div = document.createElement('div');
 	var items = new List([
@@ -83,6 +87,33 @@ test('attributes', function () {
 	items.push('foo', 'bar');
 	equal(div.getAttribute('foo'), 'bar');
 });
+
+test('attributes - should remove `removed` events listener', function () {
+	QUnit.stop();
+	var origAddEventListener = domEvents.addEventListener;
+	var origRemoveEventListener = domEvents.removeEventListener;
+
+	domEvents.addEventListener = function () {
+		QUnit.ok(true, 'addEventListener called');
+		origAddEventListener.apply(this, arguments);
+		domEvents.addEventListener = origAddEventListener;
+	};
+
+	domEvents.removeEventListener = function () {
+		QUnit.ok(true, 'addEventListener called');
+		origRemoveEventListener.apply(this, arguments);
+		domEvents.removeEventListener = origRemoveEventListener;
+		QUnit.start();
+	};
+
+	var div = document.createElement('div');
+	var text = compute('hello');
+
+	domMutate.appendChild.call(this.fixture, div);
+	live.attrs(div, text);
+	domMutate.removeChild.call(this.fixture, div);
+});
+
 test('attribute', function () {
 	var div = document.createElement('div');
 
@@ -108,6 +139,7 @@ test('attribute', function () {
 	firstObject.attr('selected', false);
 	equal(div.className, 'foo  active end');
 });
+
 test('specialAttribute with new line', function () {
 	var div = document.createElement('div');
 	var style = compute('width: 50px;\nheight:50px;');
@@ -115,6 +147,7 @@ test('specialAttribute with new line', function () {
 	equal(div.style.height, '50px');
 	equal(div.style.width, '50px');
 });
+
 test('list', function () {
 	var div = document.createElement('div'),
 		list = new List([
@@ -134,6 +167,7 @@ test('list', function () {
 	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
 	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
 });
+
 test('list with a compute', function () {
 	var div = document.createElement('div'),
 		map = new Map({
@@ -170,6 +204,7 @@ test('list with a compute', function () {
 	equal(spans.length, 3, 'there are 3 spans');
 	ok(!div.getElementsByTagName('label')[0].myexpando, 'no expando');
 });
+
 test('list with a compute that returns a list', function () {
 	var div = document.createElement('div'),
 		template = function (num) {
@@ -194,6 +229,7 @@ test('list with a compute that returns a list', function () {
 	var spans = div.getElementsByTagName('span');
 	equal(spans.length, 3, 'there are 3 spans');
 });
+
 test('text binding is memory safe (#666)', function () {
 	nodeLists.nodeMap.clear();
 
@@ -242,8 +278,6 @@ test('html live binding handles getting a function from a compute',5, function()
 	equal(div.getElementsByTagName("h1").length, 0, "got h1");
 	count(0);
 	equal(div.getElementsByTagName("h1").length, 1, "got h1");
-
-
 });
 
 test("live.list does not unbind on a list unnecessarily (#1835)", function(){
@@ -267,9 +301,6 @@ test("live.list does not unbind on a list unnecessarily (#1835)", function(){
 	var el = div.getElementsByTagName('span')[0];
 
 	live.list(el, list, template, {});
-
-
-
 });
 
 test("can.live.attr works with non-string attributes (#1790)", function() {
@@ -318,7 +349,6 @@ test('list and an falsey section (#1979)', function () {
 
 	ps = div.getElementsByTagName('p');
 	equal(ps.length, 0, 'there is 1 p');
-
 });
 
 test('list and an initial falsey section (#1979)', function(){
@@ -350,7 +380,6 @@ test('list and an initial falsey section (#1979)', function(){
 
 	ps = div.getElementsByTagName('p');
 	equal(ps.length, 0, 'there is 1 p');
-
 });
 
 test('rendered list items should re-render when updated (#2007)', function () {
