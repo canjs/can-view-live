@@ -1,6 +1,6 @@
 {
   "name": "can-view-live",
-  "version": "3.0.7",
+  "version": "3.2.0",
   "description": "",
   "homepage": "http://canjs.com",
   "repository": {
@@ -19,7 +19,7 @@
     "testee": "testee test/test.html --browsers firefox",
     "test": "npm run jshint && npm run testee",
     "jshint": "jshint ./*.js --config",
-    "release:pre": "npm version prerelease && npm publish",
+    "release:pre": "npm version prerelease && npm publish --tag pre",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
@@ -46,42 +46,24 @@
     ]
   },
   "dependencies": {
-    "can-compute": "^3.0.0",
-    "can-event": "^3.0.1",
-    "can-types": "^1.0.1",
-    "can-util": "^3.1.1",
-    "can-view-callbacks": "^3.0.0",
-    "can-view-nodelist": "^3.0.1",
-    "can-view-parser": "^3.0.0",
-    "can-view-target": "^3.0.0"
+    "can-compute": "^3.3.1",
+    "can-event": "^3.5.0-pre.2",
+    "can-observation": "^3.3.1",
+    "can-reflect": "^1.2.1",
+    "can-types": "^1.1.0-pre.2",
+    "can-util": "^3.9.6",
+    "can-view-callbacks": "^3.2.0-pre.0",
+    "can-view-nodelist": "^3.1.0-pre.0",
+    "can-view-parser": "^3.4.0-pre.0",
+    "can-view-target": "^3.1.0-pre.0"
   },
   "devDependencies": {
-    "bit-docs": "0.0.7",
-    "can-list": "^3.0.1",
-    "can-map": "^3.0.3",
-    "done-serve": "^1.2.0",
-    "donejs-cli": "^1.0.1",
-    "generator-donejs": "^1.0.5",
+    "can-list": "^3.2.0-pre.1",
+    "can-map": "^3.3.1",
     "jshint": "^2.9.1",
     "steal": "^1.2.10",
     "steal-qunit": "^1.0.1",
     "steal-tools": "^1.1.2",
-    "testee": "^0.5.0"
-  },
-  "bit-docs": {
-    "dependencies": {
-      "bit-docs-glob-finder": "^0.0.5",
-      "bit-docs-dev": "^0.0.3",
-      "bit-docs-js": "^0.0.3",
-      "bit-docs-generate-readme": "^0.0.8"
-    },
-    "glob": {
-      "pattern": "**/*.{js,md}",
-      "ignore": "node_modules/**/*"
-    },
-    "readme": {
-      "apis": "./docs/apis.json"
-    },
-    "parent": "can-view-live"
+    "testee": "^0.7.0"
   }
 }
