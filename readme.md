@@ -1,5 +1,7 @@
 # can-view-live
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-view-live.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/canjs/can-view-live.png?branch=master)](https://travis-ci.org/canjs/can-view-live)
 
 
