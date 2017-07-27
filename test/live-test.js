@@ -304,6 +304,30 @@ test("live.list does not unbind on a list unnecessarily (#1835)", function(){
 	live.list(el, list, template, {});
 });
 
+test('live.list should handle move events', function (assert) {
+	/*
+		All this test does is make sure triggering the move event
+		does not cause live.list to blow up.
+	*/
+	var parent = document.createElement('div');
+	var child = document.createElement('div');
+	parent.appendChild(child);
+	var list = new List([1, 2, 3]);
+	var template = function (num) {
+		return '<span>' + num + '</span>';
+	};
+
+	live.list(child, list, template, {});
+
+	var oldIndex = 0;
+	var newIndex = 2;
+	var val = list[oldIndex];
+	var args = [val, oldIndex, newIndex];
+	list.dispatch('move', args);
+
+	assert.ok(true, 'The list should not blow up');
+});
+
 test("can.live.attr works with non-string attributes (#1790)", function() {
 	var el = document.createElement('div'),
 		attrCompute = compute(function() {
