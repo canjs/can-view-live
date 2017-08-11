@@ -1,152 +1,28 @@
 # can-view-live
 
+[![Join the chat at https://gitter.im/canjs/canjs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/canjs/canjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/canjs/can-view-live/blob/master/LICENSE.md)
+[![npm version](https://badge.fury.io/js/can-view-live.svg)](https://www.npmjs.com/package/can-view-live)
+[![Travis build status](https://travis-ci.org/canjs/can-view-live.svg?branch=master)](https://travis-ci.org/canjs/can-view-live)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/canjs/can-view-live?branch=master&svg=true)](https://ci.appveyor.com/project/matthewp/can-view-live)
+[![Coverage status](https://coveralls.io/repos/github/canjs/can-view-live/badge.svg?branch=master)](https://coveralls.io/github/canjs/can-view-live?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-view-live.svg)](https://greenkeeper.io/)
 
-[![Build Status](https://travis-ci.org/canjs/can-view-live.png?branch=master)](https://travis-ci.org/canjs/can-view-live)
+FAILED TO GET DESCRIPTION
 
+## Documentation
 
+Read the [API docs on CanJS.com](https://canjs.com/doc/can-view-live.html).
 
+## Changelog
 
-- <code>[__can-view-live__ Object](#can-view-live-object)</code>
-  - <code>[live.html(el, compute, [parentNode])](#livehtmlel-compute-parentnode)</code>
-  - <code>[live.list(el, list, render, context, [parentNode])](#livelistel-list-render-context-parentnode)</code>
-  - <code>[live.text(el, compute, [parentNode], [nodeList])](#livetextel-compute-parentnode-nodelist)</code>
-  - <code>[live.attr(el, attributeName, compute)](#liveattrel-attributename-compute)</code>
-
-## API
-
-## can-view-live `{Object}`
-
-
-Setup live-binding between the DOM and a compute manually.
-
-
-
-### <code>Object</code>
-
-- __An__ <code>{Object}</code>:
-  object with the live-binding methods:
-  [can-view-live.html](#livehtmlel-compute-parentnode), [can-view-live.list](#livelistel-list-render-context-parentnode), [can-view-live.text](#livetextel-compute-parentnode-nodelist),
-  [can-view-live.attr](#liveattrel-attributename-compute) and [can-view-live.attrs].
-  
-
-### <code>live.html(el, compute, [parentNode])</code>
-
-
-`live.html` is used to setup incremental live-binding on a block of html.
-
-```js
-// a compute that change's it's list
-var greeting = compute(function(){
-  return "Welcome <i>"+me.attr("name")+"</i>"
-});
-
-var placeholder = document.createTextNode(" ");
-$("#greeting").append(placeholder);
-
-live.html(placeholder, greeting);
-```
-
-
-1. __el__ <code>{HTMLElement}</code>:
-  An html element to replace with the live-section.
-  
-1. __compute__ <code>{can.compute}</code>:
-  A [can.compute] whose value is HTML.
-  
-1. __parentNode__ <code>{HTMLElement}</code>:
-  An overwritable parentNode if `el`'s parent is
-  a documentFragment.
-  
-  
-  
-
-### <code>live.list(el, list, render, context, [parentNode])</code>
-
-
-Live binds a compute's list incrementally.
-
-```js
-// a compute that change's it's list
-var todos = compute(function(){
-  return new Todo.List({page: can.route.attr("page")})
-})
-
-var placeholder = document.createTextNode(" ");
-$("ul#todos").append(placeholder);
-
-can.view.live.list(
-  placeholder,
-  todos,
-  function(todo, index){
-    return "<li>"+todo.attr("name")+"</li>"
-  });
-```
-
-
-1. __el__ <code>{HTMLElement}</code>:
-  An html element to replace with the live-section.
-  
-1. __list__ <code>{can-compute|can-list|can-define/list/list}</code>:
-  An observable list type.
-  
-1. __render__ <code>{function(index, index)}</code>:
-  A function that when called with
-  the incremental item to render and the index of the item in the list.
-  
-1. __context__ <code>{Object}</code>:
-  The `this` the `render` function will be called with.
-  
-1. __parentNode__ <code>{HTMLElement}</code>:
-  An overwritable parentNode if `el`'s parent is
-  a documentFragment.
-  
-  
-  
-
-### <code>live.text(el, compute, [parentNode], [nodeList])</code>
-
-
-Replaces one element with some content while keeping [can-view-live.nodeLists nodeLists] data correct.
-
-
-### <code>live.attr(el, attributeName, compute)</code>
-
-
-Keep an attribute live to a [can-compute].
-
-```js
-var div = document.createElement('div');
-var compute = canCompute("foo bar");
-live.attr(div,"class", compute);
-```
-
-
-1. __el__ <code>{HTMLElement}</code>:
-  The element whos attribute will be kept live.
-1. __attributeName__ <code>{String}</code>:
-  The attribute name.
-1. __compute__ <code>{can-compute}</code>:
-  The compute.
-  
-  
+See the [latest releases on GitHub](https://github.com/canjs/can-view-live/releases).
 
 ## Contributing
 
-### Making a Build
+The [contribution guide](https://github.com/canjs/can-view-live/blob/master/CONTRIBUTING.md) has information on getting help, reporting bugs, developing locally, and more.
 
-To make a build of the distributables into `dist/` in the cloned repository run
+## License
 
-```
-npm install
-node build
-```
+[MIT](https://github.com/canjs/can-view-live/blob/master/LICENSE.md)
 
-### Running the tests
-
-Tests can run in the browser by opening a webserver and visiting the `test.html` page.
-Automated tests that run the tests from the command line in Firefox can be run with
-
-```
-npm test
-```
