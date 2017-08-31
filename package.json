@@ -49,15 +49,15 @@
     "can-event": "^3.6.0",
     "can-observation": "^3.3.1",
     "can-reflect": "^1.2.1",
-    "can-types": "^1.1.0-pre.2",
+    "can-types": "^1.1.0",
     "can-util": "^3.9.6",
     "can-view-callbacks": "^3.2.0",
-    "can-view-nodelist": "^3.1.0-pre.0",
-    "can-view-parser": "^3.4.0-pre.0",
-    "can-view-target": "^3.1.0-pre.0"
+    "can-view-nodelist": "^3.1.0",
+    "can-view-parser": "^3.4.0",
+    "can-view-target": "^3.1.0"
   },
   "devDependencies": {
-    "can-list": "^3.2.0-pre.1",
+    "can-list": "^3.2.0",
     "can-map": "^3.3.1",
     "jshint": "^2.9.1",
     "steal": "^1.2.10",
