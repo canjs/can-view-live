@@ -13,6 +13,8 @@ var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
 
 var domMutate = require('can-util/dom/mutate/mutate');
 var domAttr = require("can-util/dom/attr/attr");
+var fragment = require('can-util/dom/fragment/fragment');
+var makeArray = require('can-util/js/make-array/make-array');
 
 QUnit.module('can-view-live',{
 	setup: function(){
@@ -36,11 +38,9 @@ test('html', function () {
 		return html;
 	});
 	live.html(span, html, div);
-	equal(div.getElementsByTagName('label')
-		.length, 2);
+	equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
-	equal(div.getElementsByTagName('label')
-		.length, 3);
+	equal(div.getElementsByTagName('label').length, 3);
 });
 var esc = function (str) {
 	return str.replace(/</g, '&lt;')
@@ -207,26 +207,18 @@ test('list within a compute', function () {
 });
 
 test('list with a compute that returns a list', function () {
-	var div = document.createElement('div'),
-		template = function (num) {
-			return '<label>num=</label> <span>' + num + '</span>';
-		};
-	var arrCompute = compute([
-		0,
-		1
-	]);
+	var div = document.createElement('div');
+	var template = function (num) {
+		return '<label>num=</label> <span>' + num + '</span>';
+	};
+	var arrCompute = compute([ 0, 1 ]);
 	div.innerHTML = 'my <b>fav</b> nums: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
 
 	live.list(el, arrCompute, template, {});
 
-	equal(div.getElementsByTagName('label')
-		.length, 2, 'There are 2 labels');
-	arrCompute([
-		0,
-		1,
-		2
-	]);
+	equal(div.getElementsByTagName('label').length, 2, 'There are 2 labels');
+	arrCompute([ 0, 1, 2 ]);
 	var spans = div.getElementsByTagName('span');
 	equal(spans.length, 3, 'there are 3 spans');
 });
@@ -348,16 +340,12 @@ test('list and an falsey section (#1979)', function () {
 			return '<p>NOTHING</p>';
 		};
 
-	var listCompute = compute([
-		0,
-		1
-	]);
+	var listCompute = compute([ 0, 1 ]);
 	div.innerHTML = 'my <b>fav</b> nums: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
 	live.list(el, listCompute, template, {}, undefined, undefined, falseyTemplate );
 
-	equal(div.getElementsByTagName('label')
-		.length, 2, 'There are 2 labels');
+	equal(div.getElementsByTagName('label').length, 2, 'There are 2 labels');
 
 	listCompute([]);
 
@@ -458,6 +446,69 @@ test('list items should be correct even if renderer flushes batch (#8)', functio
 	equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
 });
 
+test('changing items in a live.list after it has been unregistered works (#55)', function() {
+	// this test replicates the behavior of this stache template:
+	//
+	// {{#if show}}
+	//		{{#each list}}
+	//			{{.}}
+	//		{{/each}}
+	//	{{/if}}
+	//
+	//	and this code:
+	//
+	//	canBatch.start();
+	//	show = false;
+	//	list.replace(...);
+	//	canBatch.stop();
+	var map = new Map({
+		show: true,
+		list: [ 'one' ]
+	});
+
+	// set up nodelists
+	var htmlNodeList = makeArray(fragment("<div></div>").childNodes);
+	nodeLists.register(htmlNodeList, function(){}, true);
+
+	var listNodeList = makeArray(fragment("<div></div>").childNodes);
+	nodeLists.register(listNodeList, function(){}, htmlNodeList, true);
+
+	// set up elements
+	var listTextNode = document.createTextNode('');
+	var listFrag = document.createDocumentFragment();
+	listFrag.appendChild(listTextNode);
+
+	var htmlTextNode = document.createTextNode('');
+	var div = document.createElement('div');
+	div.appendChild(htmlTextNode);
+
+	// create live.list for `{{#each list}}`
+	var listObs = new Observation(function() {
+		return map.attr('list');
+	});
+	var listRenderer = function(item) {
+		// must use an Observation as the live.list "compute"
+		// Observation.prototype.get() will trigger a canBatch.flush() (if observation is bound)
+		// which will cause the listNodeList to be unregistered
+		Observation.temporarilyBind(item);
+		return item.get();
+	};
+	live.list(listTextNode, listObs, listRenderer, map, listTextNode.parentNode, listNodeList);
+
+	// create live.html for `{{#if show}}`
+	var htmlObservation = new Observation(function() {
+		return map.attr('show') ? listFrag : undefined;
+	});
+	live.html(htmlTextNode, htmlObservation, htmlTextNode.parentNode, htmlNodeList);
+
+	canBatch.start();
+	map.attr('show', false);
+	map.attr('list').replace([ 'two', 'three' ]);
+	canBatch.stop();
+
+	ok(true, 'should not throw');
+});
+
 QUnit.test("Works with Observations - .html", function(){
 	var div = document.createElement('div'),
 		span = document.createElement('span');
@@ -474,11 +525,9 @@ QUnit.test("Works with Observations - .html", function(){
 		return html;
 	});
 	live.html(span, html, div);
-	equal(div.getElementsByTagName('label')
-		.length, 2);
+	equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
-	equal(div.getElementsByTagName('label')
-		.length, 3);
+	equal(div.getElementsByTagName('label').length, 3);
 });
 
 
