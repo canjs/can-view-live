@@ -22,26 +22,7 @@ QUnit.module('can-view-live',{
 	}
 });
 
-test('html', function () {
-	var div = document.createElement('div'),
-		span = document.createElement('span');
-	div.appendChild(span);
-	var items = new List([
-		'one',
-		'two'
-	]);
-	var html = compute(function () {
-		var html = '';
-		items.each(function (item) {
-			html += '<label>' + item + '</label>';
-		});
-		return html;
-	});
-	live.html(span, html, div);
-	equal(div.getElementsByTagName('label').length, 2);
-	items.push('three');
-	equal(div.getElementsByTagName('label').length, 3);
-});
+
 var esc = function (str) {
 	return str.replace(/</g, '&lt;')
 		.replace(/>/g, '&gt;');
@@ -149,25 +130,7 @@ test('specialAttribute with new line', function () {
 	equal(div.style.width, '50px');
 });
 
-test('list', function () {
-	var div = document.createElement('div'),
-		list = new List([
-			'sloth',
-			'bear'
-		]),
-		template = function (animal) {
-			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
-		};
-	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
-	var el = div.getElementsByTagName('span')[0];
-	live.list(el, list, template, {});
-	equal(div.getElementsByTagName('label')
-		.length, 2, 'There are 2 labels');
-	div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
-	list.push('turtle');
-	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
-	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
-});
+
 
 test('list within a compute', function () {
 	var div = document.createElement('div'),
@@ -244,34 +207,7 @@ test('text binding is memory safe (#666)', function () {
 	}, 100);
 });
 
-test('html live binding handles getting a function from a compute',5, function(){
-	var handler = function(el){
-		ok(true, "called handler");
-		equal(el.nodeType, 3, "got a placeholder");
-	};
 
-	var div = document.createElement('div'),
-		placeholder = document.createTextNode('');
-	div.appendChild(placeholder);
-
-	var count = compute(0);
-	var html = compute(function(){
-		if(count() === 0) {
-			return "<h1>Hello World</h1>";
-		} else {
-			return handler;
-		}
-	});
-
-
-	live.html(placeholder, html, div);
-
-	equal(div.getElementsByTagName("h1").length, 1, "got h1");
-	count(1);
-	equal(div.getElementsByTagName("h1").length, 0, "got h1");
-	count(0);
-	equal(div.getElementsByTagName("h1").length, 1, "got h1");
-});
 
 test("live.list does not unbind on a list unnecessarily (#1835)", function(){
 	expect(0);
@@ -509,26 +445,7 @@ test('changing items in a live.list after it has been unregistered works (#55)',
 	ok(true, 'should not throw');
 });
 
-QUnit.test("Works with Observations - .html", function(){
-	var div = document.createElement('div'),
-		span = document.createElement('span');
-	div.appendChild(span);
-	var items = new List([
-		'one',
-		'two'
-	]);
-	var html = new Observation(function () {
-		var html = '';
-		items.each(function (item) {
-			html += '<label>' + item + '</label>';
-		});
-		return html;
-	});
-	live.html(span, html, div);
-	equal(div.getElementsByTagName('label').length, 2);
-	items.push('three');
-	equal(div.getElementsByTagName('label').length, 3);
-});
+
 
 
 QUnit.test('Works with Observations - .list', function () {
