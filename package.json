@@ -45,8 +45,8 @@
     ]
   },
   "dependencies": {
-    "can-observation": "^4.0.0-pre.2",
-    "can-queues": "file:../can-queues",
+    "can-observation": "^4.0.0-pre.3",
+    "can-queues": "<2.0.0",
     "can-reflect": "^1.5.0",
     "can-simple-observable": "^2.0.0-pre.3",
     "can-types": "^1.1.0",
@@ -57,7 +57,7 @@
     "can-view-target": "^3.1.0"
   },
   "devDependencies": {
-    "can-define": "^2.0.0-pre.3",
+    "can-define": "^2.0.0-pre.4",
     "can-simple-map": "^4.0.0-pre.2",
     "detect-cyclic-packages": "^1.1.0",
     "jshint": "^2.9.1",
