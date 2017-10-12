@@ -46,8 +46,8 @@
   },
   "dependencies": {
     "can-observation": "^4.0.0-pre.2",
-    "can-queues": "^0.1.1",
-    "can-reflect": "^1.2.1",
+    "can-queues": "file:../can-queues",
+    "can-reflect": "^1.5.0",
     "can-simple-observable": "^2.0.0-pre.3",
     "can-types": "^1.1.0",
     "can-util": "^3.9.6",
