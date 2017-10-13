@@ -615,4 +615,29 @@ QUnit.test('Works with Observations - .attr', function(){
 	equal(div.className, 'foo selected active end');
 	firstObject.attr('selected', false);
 	equal(div.className, 'foo  active end');
-})
+});
+
+QUnit.test("events are torn down from correct list on change", function() {
+	var div = document.createElement('div');
+	var list = new List([1, 2, 3]);
+	var filteredList;
+	var c = compute(list);
+
+
+		template = function (number) {
+			return '<label>Odd number=</label> <span>' + number.get() + '</span>';
+		};
+	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
+	var el = div.getElementsByTagName('span')[0];
+	live.list(el, c, template, {});
+	
+	ok(list.__bindEvents.add && list.__bindEvents.add.length > 0, "Add handler has been added to list");
+
+	c(filteredList = list.filter(function(x) {
+		return x % 2;
+	}));
+
+	ok(!list.__bindEvents.add || list.__bindEvents.add.length === 0, "Add handler has been removed from list");
+	ok(filteredList.__bindEvents.add && filteredList.__bindEvents.add.length > 0, "Add handler has been added to filteredList");
+});
+
