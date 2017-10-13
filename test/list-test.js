@@ -136,7 +136,7 @@ QUnit.test('list and an falsey section (#1979)', function () {
 		template = function (num) {
 			return '<label>num=</label> <span>' + num + '</span>';
 		},
-		falseyTemplate = function (num) {
+		falseyTemplate = function () {
 			return '<p>NOTHING</p>';
 		};
 
@@ -170,7 +170,7 @@ QUnit.test('list and an initial falsey section (#1979)', function(){
 		template = function (num) {
 			return '<label>num=</label> <span>' + num + '</span>';
 		},
-		falseyTemplate = function (num) {
+		falseyTemplate = function () {
 			return '<p>NOTHING</p>';
 		};
 
