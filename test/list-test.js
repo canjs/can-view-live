@@ -8,8 +8,14 @@ var canReflect = require("can-reflect");
 var queues = require("can-queues");
 var fragment = require('can-util/dom/fragment/fragment');
 var NodeLists = require("can-view-nodelist");
+var domMutate = require('can-util/dom/mutate/mutate');
+var canSymbol = require("can-symbol");
 
-QUnit.module("can-view-live.list");
+QUnit.module("can-view-live.list",{
+	setup: function(){
+		this.fixture = document.getElementById("qunit-fixture");
+	}
+});
 
 
 QUnit.test('basics', function () {
@@ -331,4 +337,37 @@ QUnit.test('Works with Observations - .list', function () {
 	var spans = div.getElementsByTagName('span');
 	equal(spans.length, 3, 'there are 3 spans');
 	ok(!div.getElementsByTagName('label')[0].myexpando, 'no expando');
+});
+
+test("no memory leaks", function () {
+	var div = document.createElement('div'),
+		map = new SimpleMap({
+			animals: new DefineList([
+				'bear',
+				'turtle'
+			])
+		}),
+		template = function (animal) {
+			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
+		};
+	var listObservation = new Observation(function () {
+		return map.attr('animals');
+	});
+	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
+	var el = div.getElementsByTagName('span')[0];
+	this.fixture.appendChild(div);
+	var fixture = this.fixture;
+
+	live.list(el, listObservation, template, {});
+
+
+	QUnit.stop();
+	setTimeout(function(){
+		domMutate.removeChild.call(fixture,div);
+		setTimeout(function () {
+			var handlers = map[canSymbol.for("can.meta")].handlers.get([]);
+			equal(handlers.length, 0, "there are no bindings");
+			start();
+		}, 50);
+	},10);
 });

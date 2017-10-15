@@ -59,6 +59,7 @@
   "devDependencies": {
     "can-define": "^2.0.0-pre.4",
     "can-simple-map": "^4.0.0-pre.2",
+    "can-symbol": "^1.3.0",
     "detect-cyclic-packages": "^1.1.0",
     "jshint": "^2.9.1",
     "steal": "^1.2.10",
