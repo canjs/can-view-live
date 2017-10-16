@@ -1,14 +1,5 @@
-var live = require('can-view-live');
 var DefineList = require("can-define/list/list");
-var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
-var SimpleObservable = require("can-simple-observable");
-var SimpleMap = require("can-simple-map");
-var canReflect = require("can-reflect");
-var queues = require("can-queues");
-var fragment = require('can-util/dom/fragment/fragment');
-var NodeLists = require("can-view-nodelist");
-var domMutate = require('can-util/dom/mutate/mutate');
 var canSymbol = require("can-symbol");
 var Patcher = require("../lib/patcher");
 
