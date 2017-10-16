@@ -3,6 +3,7 @@ var DefineList = require("can-define/list/list");
 var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
+var NodeLists = require("can-view-nodelist");
 
 QUnit.module("can-view-live.html");
 
@@ -77,4 +78,45 @@ QUnit.test("Works with Observations - .html", function(){
 	equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
 	equal(div.getElementsByTagName('label').length, 3);
+});
+
+QUnit.test("child elements must disconnect before parents can re-evaluate", 1,function(){
+	var observable = new SimpleObservable("value");
+
+
+	var childObservation = new Observation(function child(){
+		QUnit.ok(true, "called child content once");
+		observable.get();
+		return "CHILD CONTENT";
+	},null, {priority: 1});
+
+	var htmlNodeList= [];
+
+	var parentObservation = new Observation(function parent(){
+		var result = observable.get();
+		if(result === "value") {
+			var childTextNode = document.createTextNode('');
+			var childFrag = document.createDocumentFragment();
+			childFrag.appendChild(childTextNode);
+			var nodeList = [childTextNode];
+
+			NodeLists.register(nodeList, null, htmlNodeList, true);
+			live.html(childTextNode, childObservation, null, nodeList);
+			return childFrag;
+		} else {
+			return "NEW CONTENT";
+		}
+	},null,{priority: 0});
+
+	var parentTextNode = document.createTextNode('');
+	var div = document.createElement('div');
+	div.appendChild(parentTextNode);
+	htmlNodeList.push(parentTextNode);
+
+	NodeLists.register(htmlNodeList, function(){}, true, true);
+	live.html(parentTextNode, parentObservation, div, htmlNodeList);
+
+	observable.set("VALUE");
+
+
 });
