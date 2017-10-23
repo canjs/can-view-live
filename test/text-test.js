@@ -23,7 +23,7 @@ QUnit.test('text', function() {
 	div.appendChild(span);
 	var value = new SimpleObservable(['one', 'two']);
 
-	var text = new Observation(function() {
+	var text = new Observation(function html() {
 		var html = '';
 		value.get().forEach(function(item) {
 			html += '<label>' + item + '</label>';

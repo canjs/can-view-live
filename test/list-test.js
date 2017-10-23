@@ -55,7 +55,7 @@ QUnit.test('list within an Observation', 5, function () {
 		template = function (animal) {
 			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
 		};
-	var listCompute = new Observation(function () {
+	var listCompute = new Observation(function animalsFromMap() {
 		return map.attr('animals');
 	});
 	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';

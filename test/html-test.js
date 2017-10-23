@@ -16,7 +16,7 @@ test('basics', function () {
 		'one',
 		'two'
 	]);
-	var html = new Observation(function () {
+	var html = new Observation(function itemsHTML() {
 		var html = '';
 		items.forEach(function (item) {
 			html += '<label>' + item + '</label>';
