@@ -3,6 +3,8 @@ var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var domAttr = require("can-util/dom/attr/attr");
 var SimpleObservable = require("can-simple-observable");
+var canReflect = require('can-reflect');
+var domEvents = require('can-util/dom/events/events');
 
 QUnit.module("can-view-live.attr",{
     setup: function(){
@@ -53,4 +55,39 @@ QUnit.test("can.live.attr works with non-string attributes (#1790)", function() 
 	domAttr.set(el, "value", 1);
 	live.attr(el, 'value', attrCompute);
 	ok(true, 'No exception thrown.');
+});
+
+QUnit.test('getValueDependencies', function(assert) {
+	var done = assert.async();
+	assert.expect(2);
+
+	var div = document.createElement('div');
+	document.body.appendChild(div);
+
+	var id = new SimpleObservable('foo');
+	var title = new SimpleObservable('something');
+
+	live.attr(div, 'id', id);
+	live.attr(div, 'title', title);
+
+	assert.deepEqual(
+		canReflect.getValueDependencies(div).valueDependencies,
+		new Set([id, title]),
+		'should return the two SimpleObservable as dependencies'
+	);
+
+	domEvents.addEventListener.call(div, 'removed', function checkTeardown() {
+		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
+
+		assert.equal(
+			typeof canReflect.getValueDependencies(div),
+			'undefined',
+			'dependencies should be cleared out when elements is removed'
+		);
+
+		done();
+	});
+
+	// remove element from the DOM
+	div.remove();
 });
