@@ -4,6 +4,8 @@ var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
 var domMutate = require('can-util/dom/mutate/mutate');
 var nodeLists = require('can-view-nodelist');
+var canReflect = require('can-reflect');
+var domEvents = require('can-util/dom/events/events');
 
 QUnit.module("can-view-live.text", {
 	setup: function() {
@@ -55,4 +57,45 @@ QUnit.test('text binding is memory safe (#666)', function() {
 		ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
 		start();
 	}, 100);
+});
+
+QUnit.test('getValueDependencies', function(assert) {
+	var done = assert.async();
+	assert.expect(2);
+
+	var div = document.createElement('div');
+	var span = document.createElement('span');
+
+	div.appendChild(span);
+	document.body.appendChild(div);
+
+	var value = new SimpleObservable(['one', 'two']);
+	var text = new Observation(function html() {
+		return value.get()
+			.map(function(item) {
+				return '<label>' + item + '</label>';
+			})
+			.join('');
+	});
+
+	live.text(span, text, div);
+
+	assert.deepEqual(
+		canReflect.getValueDependencies(div).valueDependencies,
+		new Set([text])
+	);
+
+	domEvents.addEventListener.call(div, 'removed', function checkTeardown() {
+		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
+
+		assert.equal(
+			typeof canReflect.getValueDependencies(div),
+			'undefined',
+			'dependencies should be clear out when elements is removed'
+		);
+
+		done();
+	});
+
+	div.remove();
 });

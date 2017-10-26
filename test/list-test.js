@@ -10,6 +10,7 @@ var fragment = require('can-util/dom/fragment/fragment');
 var NodeLists = require("can-view-nodelist");
 var domMutate = require('can-util/dom/mutate/mutate');
 var canSymbol = require("can-symbol");
+var domEvents = require('can-util/dom/events/events');
 
 QUnit.module("can-view-live.list",{
 	setup: function(){
@@ -370,4 +371,40 @@ test("no memory leaks", function () {
 			start();
 		}, 50);
 	},10);
+});
+
+QUnit.test('getValueDependencies', function(assert) {
+	var done = assert.async();
+	assert.expect(2);
+
+	var div = document.createElement('div');
+	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
+	document.body.appendChild(div);
+
+	var el = div.getElementsByTagName('span')[0];
+	var list = new DefineList(['sloth', 'bear']);
+	var template = function(animal) {
+		return '<label>Animal=</label> <span>' + animal.get() + '</span>';
+	};
+
+	live.list(el, list, template, {});
+
+	assert.deepEqual(
+		canReflect.getValueDependencies(div).valueDependencies,
+		new Set([list])
+	);
+
+	domEvents.addEventListener.call(div, 'removed', function checkTeardown() {
+		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
+
+		assert.equal(
+			typeof canReflect.getValueDependencies(div),
+			'undefined',
+			'dependencies should be cleared when parent node is removed'
+		);
+
+		done();
+	});
+
+	div.remove();
 });
