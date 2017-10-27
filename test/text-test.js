@@ -6,6 +6,7 @@ var domMutate = require('can-util/dom/mutate/mutate');
 var nodeLists = require('can-view-nodelist');
 var canReflect = require('can-reflect');
 var domEvents = require('can-util/dom/events/events');
+var testHelpers = require('can-test-helpers');
 
 QUnit.module("can-view-live.text", {
 	setup: function() {
@@ -59,7 +60,7 @@ QUnit.test('text binding is memory safe (#666)', function() {
 	}, 100);
 });
 
-QUnit.test('getValueDependencies', function(assert) {
+testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 	var done = assert.async();
 	assert.expect(2);
 

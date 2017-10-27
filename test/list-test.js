@@ -11,6 +11,7 @@ var NodeLists = require("can-view-nodelist");
 var domMutate = require('can-util/dom/mutate/mutate');
 var canSymbol = require("can-symbol");
 var domEvents = require('can-util/dom/events/events');
+var testHelpers = require('can-test-helpers');
 
 QUnit.module("can-view-live.list",{
 	setup: function(){
@@ -373,7 +374,7 @@ test("no memory leaks", function () {
 	},10);
 });
 
-QUnit.test('getValueDependencies', function(assert) {
+testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 	var done = assert.async();
 	assert.expect(2);
 

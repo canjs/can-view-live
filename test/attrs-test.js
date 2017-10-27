@@ -6,6 +6,7 @@ var queues = require("can-queues");
 var domEvents = require('can-util/dom/events/events');
 var domMutate = require('can-util/dom/mutate/mutate');
 var canReflect = require('can-reflect');
+var testHelpers = require('can-test-helpers');
 
 QUnit.module("can-view-live.attrs",{
     setup: function(){
@@ -62,7 +63,7 @@ QUnit.test('should remove `removed` events listener', function () {
 	domMutate.removeChild.call(this.fixture, div);
 });
 
-QUnit.test('getValueDependencies', function(assert) {
+testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 	var done = assert.async();
 	assert.expect(2);
 

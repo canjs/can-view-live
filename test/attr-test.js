@@ -5,6 +5,7 @@ var domAttr = require("can-util/dom/attr/attr");
 var SimpleObservable = require("can-simple-observable");
 var canReflect = require('can-reflect');
 var domEvents = require('can-util/dom/events/events');
+var testHelpers = require('can-test-helpers');
 
 QUnit.module("can-view-live.attr",{
     setup: function(){
@@ -57,7 +58,7 @@ QUnit.test("can.live.attr works with non-string attributes (#1790)", function() 
 	ok(true, 'No exception thrown.');
 });
 
-QUnit.test('getValueDependencies', function(assert) {
+testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 	var done = assert.async();
 	assert.expect(2);
 

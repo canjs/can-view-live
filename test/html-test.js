@@ -4,6 +4,7 @@ var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
 var NodeLists = require("can-view-nodelist");
+var testHelpers = require('can-test-helpers');
 
 QUnit.module("can-view-live.html");
 
@@ -80,7 +81,7 @@ QUnit.test("Works with Observations - .html", function(){
 	equal(div.getElementsByTagName('label').length, 3);
 });
 
-QUnit.test("child elements must disconnect before parents can re-evaluate", 1,function(){
+testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", 1,function(){
 	var observable = new SimpleObservable("value");
 
 
