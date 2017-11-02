@@ -48,6 +48,7 @@
     "can-observation": "^4.0.0-pre.3",
     "can-queues": "<2.0.0",
     "can-reflect": "^1.5.0",
+    "can-reflect-mutate-dependencies": "0.0.2",
     "can-simple-observable": "^2.0.0-pre.3",
     "can-symbol": "^1.4.1",
     "can-types": "^1.1.0",

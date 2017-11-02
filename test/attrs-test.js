@@ -5,8 +5,8 @@ var SimpleObservable = require("can-simple-observable");
 var queues = require("can-queues");
 var domEvents = require('can-util/dom/events/events');
 var domMutate = require('can-util/dom/mutate/mutate');
-var canReflect = require('can-reflect');
 var testHelpers = require('can-test-helpers');
+var mutateDeps = require('can-reflect-mutate-dependencies');
 
 QUnit.module("can-view-live.attrs",{
     setup: function(){
@@ -63,7 +63,7 @@ QUnit.test('should remove `removed` events listener', function () {
 	domMutate.removeChild.call(this.fixture, div);
 });
 
-testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
+testHelpers.dev.devOnlyTest('mutatedValueDependencies', function(assert) {
 	var done = assert.async();
 	assert.expect(2);
 
@@ -84,7 +84,7 @@ testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 	live.attrs(div, text);
 
 	assert.deepEqual(
-		canReflect.getValueDependencies(div).valueDependencies,
+		mutateDeps.getValueDependencies(div).mutatedValueDependencies,
 		new Set([text])
 	);
 
@@ -92,7 +92,7 @@ testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
 
 		assert.equal(
-			typeof canReflect.getValueDependencies(div),
+			typeof mutateDeps.getValueDependencies(div),
 			'undefined',
 			'dependencies should be cleared out when element is removed'
 		);
