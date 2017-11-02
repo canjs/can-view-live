@@ -3,9 +3,9 @@ var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var domAttr = require("can-util/dom/attr/attr");
 var SimpleObservable = require("can-simple-observable");
-var canReflect = require('can-reflect');
 var domEvents = require('can-util/dom/events/events');
 var testHelpers = require('can-test-helpers');
+var mutateDeps = require('can-reflect-mutate-dependencies');
 
 QUnit.module("can-view-live.attr",{
     setup: function(){
@@ -58,7 +58,7 @@ QUnit.test("can.live.attr works with non-string attributes (#1790)", function() 
 	ok(true, 'No exception thrown.');
 });
 
-testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
+testHelpers.dev.devOnlyTest('mutatedValueDependencies', function(assert) {
 	var done = assert.async();
 	assert.expect(2);
 
@@ -72,7 +72,7 @@ testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 	live.attr(div, 'title', title);
 
 	assert.deepEqual(
-		canReflect.getValueDependencies(div).valueDependencies,
+		mutateDeps.getValueDependencies(div).mutatedValueDependencies,
 		new Set([id, title]),
 		'should return the two SimpleObservable as dependencies'
 	);
@@ -81,7 +81,7 @@ testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
 
 		assert.equal(
-			typeof canReflect.getValueDependencies(div),
+			typeof mutateDeps.getValueDependencies(div),
 			'undefined',
 			'dependencies should be cleared out when elements is removed'
 		);

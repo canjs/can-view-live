@@ -4,9 +4,9 @@ var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
 var domMutate = require('can-util/dom/mutate/mutate');
 var nodeLists = require('can-view-nodelist');
-var canReflect = require('can-reflect');
 var domEvents = require('can-util/dom/events/events');
 var testHelpers = require('can-test-helpers');
+var mutateDeps = require('can-reflect-mutate-dependencies');
 
 QUnit.module("can-view-live.text", {
 	setup: function() {
@@ -60,7 +60,7 @@ QUnit.test('text binding is memory safe (#666)', function() {
 	}, 100);
 });
 
-testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
+testHelpers.dev.devOnlyTest('mutatedValueDependencies', function(assert) {
 	var done = assert.async();
 	assert.expect(2);
 
@@ -82,7 +82,7 @@ testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 	live.text(span, text, div);
 
 	assert.deepEqual(
-		canReflect.getValueDependencies(div).valueDependencies,
+		mutateDeps.getValueDependencies(div).mutatedValueDependencies,
 		new Set([text])
 	);
 
@@ -90,7 +90,7 @@ testHelpers.dev.devOnlyTest('getValueDependencies', function(assert) {
 		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
 
 		assert.equal(
-			typeof canReflect.getValueDependencies(div),
+			typeof mutateDeps.getValueDependencies(div),
 			'undefined',
 			'dependencies should be clear out when elements is removed'
 		);
