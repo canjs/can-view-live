@@ -6,6 +6,7 @@ var nodeLists = require('can-view-nodelist');
 var canBatch = require('can-event/batch/batch');
 var Observation = require("can-observation");
 var domEvents = require('can-util/dom/events/events');
+var globals = require('can-globals');
 
 var QUnit = require('steal-qunit');
 
@@ -223,25 +224,36 @@ test('list with a compute that returns a list', function () {
 	equal(spans.length, 3, 'there are 3 spans');
 });
 
-test('text binding is memory safe (#666)', function () {
+function afterMutation (cb) {
+	var doc = globals.getKeyValue('document');
+	var div = doc.createElement("div");
+	domEvents.addEventListener.call(div, "inserted", function(){
+		doc.body.removeChild(div);
+		setTimeout(cb, 5);
+	});
+	setTimeout(function(){
+		domMutate.appendChild.call(doc.body, div);
+	},10);
+}
+
+test('text binding is memory safe (#666)', function (assert) {
+	var done = assert.async();
+	var div = document.createElement('div');
+	var span = document.createElement('span');
+	var text = compute(function () {
+		return 'foo';
+	});
+
 	nodeLists.nodeMap.clear();
-
-	var div = document.createElement('div'),
-		span = document.createElement('span'),
-		text = compute(function () {
-			return 'foo';
-		});
 	div.appendChild(span);
-
 	domMutate.appendChild.call(this.fixture, div);
 
 	live.text(span, text, div);
 	domMutate.removeChild.call(this.fixture, div);
-	stop();
-	setTimeout(function () {
-		ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
-		start();
-	}, 100);
+	afterMutation(function () {
+		assert.ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
+		done();
+	});
 });
 
 test('html live binding handles getting a function from a compute',5, function(){
@@ -638,4 +650,3 @@ QUnit.test("events are torn down from correct list on change", function() {
 	ok(!list.__bindEvents.add || list.__bindEvents.add.length === 0, "Add handler has been removed from list");
 	ok(filteredList.__bindEvents.add && filteredList.__bindEvents.add.length > 0, "Add handler has been added to filteredList");
 });
-

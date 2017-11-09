@@ -58,6 +58,7 @@
     "can-view-target": "^3.1.0"
   },
   "devDependencies": {
+    "can-globals": "^0.2.6",
     "can-list": "^3.2.0",
     "can-map": "^3.3.1",
     "detect-cyclic-packages": "^1.1.0",
