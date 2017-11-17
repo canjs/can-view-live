@@ -224,18 +224,6 @@ test('list with a compute that returns a list', function () {
 	equal(spans.length, 3, 'there are 3 spans');
 });
 
-function afterMutation (cb) {
-	var doc = globals.getKeyValue('document');
-	var div = doc.createElement("div");
-	domEvents.addEventListener.call(div, "inserted", function(){
-		doc.body.removeChild(div);
-		setTimeout(cb, 5);
-	});
-	setTimeout(function(){
-		domMutate.appendChild.call(doc.body, div);
-	},10);
-}
-
 test('text binding is memory safe (#666)', function (assert) {
 	var done = assert.async();
 	var div = document.createElement('div');
@@ -250,7 +238,8 @@ test('text binding is memory safe (#666)', function (assert) {
 
 	live.text(span, text, div);
 	domMutate.removeChild.call(this.fixture, div);
-	afterMutation(function () {
+
+	domEvents.addEventListener.call(div, 'removed', function () {
 		assert.ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
 		done();
 	});
