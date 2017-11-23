@@ -12,7 +12,7 @@ var domMutate = require('can-util/dom/mutate/mutate');
 var canSymbol = require("can-symbol");
 var domEvents = require('can-util/dom/events/events');
 var testHelpers = require('can-test-helpers');
-var mutateDeps = require('can-reflect-mutate-dependencies');
+var canReflectDeps = require('can-reflect-dependencies');
 
 QUnit.module("can-view-live.list",{
 	setup: function(){
@@ -375,7 +375,7 @@ test("no memory leaks", function () {
 	},10);
 });
 
-testHelpers.dev.devOnlyTest('mutatedValueDependencies', function(assert) {
+testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	var done = assert.async();
 	assert.expect(2);
 
@@ -392,7 +392,11 @@ testHelpers.dev.devOnlyTest('mutatedValueDependencies', function(assert) {
 	live.list(el, list, template, {});
 
 	assert.deepEqual(
-		mutateDeps.getValueDependencies(div).mutatedValueDependencies,
+		canReflectDeps
+			.getDependencyDataOf(div)
+			.whatChangesMe
+			.mutate
+			.valueDependencies,
 		new Set([list])
 	);
 
@@ -400,7 +404,7 @@ testHelpers.dev.devOnlyTest('mutatedValueDependencies', function(assert) {
 		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
 
 		assert.equal(
-			typeof mutateDeps.getValueDependencies(div),
+			typeof canReflectDeps.getDependencyDataOf(div),
 			'undefined',
 			'dependencies should be cleared when parent node is removed'
 		);
