@@ -70,7 +70,7 @@ QUnit.test("Works with Observations - .html", function(){
 	]);
 	var html = new Observation(function () {
 		var html = '';
-		items.each(function (item) {
+		items.forEach(function (item) {
 			html += '<label>' + item + '</label>';
 		});
 		return html;
