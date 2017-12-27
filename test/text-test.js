@@ -2,9 +2,9 @@ var live = require('can-view-live');
 var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
-var domMutate = require('can-util/dom/mutate/mutate');
+var domMutate = require('can-dom-mutate');
+var domMutateNode = require('can-dom-mutate/node');
 var nodeLists = require('can-view-nodelist');
-var domEvents = require('can-util/dom/events/events');
 var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
 
@@ -49,10 +49,10 @@ QUnit.test('text binding is memory safe (#666)', function() {
 		});
 	div.appendChild(span);
 
-	domMutate.appendChild.call(this.fixture, div);
+	domMutateNode.appendChild.call(this.fixture, div);
 
 	live.text(span, text, div);
-	domMutate.removeChild.call(this.fixture, div);
+	domMutateNode.removeChild.call(this.fixture, div);
 	stop();
 	setTimeout(function() {
 		ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
@@ -90,8 +90,8 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		new Set([text])
 	);
 
-	domEvents.addEventListener.call(div, 'removed', function checkTeardown() {
-		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
+	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+		undo();
 
 		assert.equal(
 			typeof canReflectDeps.getDependencyDataOf(div),

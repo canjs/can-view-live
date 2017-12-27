@@ -3,8 +3,8 @@ var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
 var queues = require("can-queues");
-var domEvents = require('can-util/dom/events/events');
-var domMutate = require('can-util/dom/mutate/mutate');
+var domMutate = require('can-dom-mutate');
+var domMutateNode = require('can-dom-mutate/node');
 var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
 
@@ -37,30 +37,27 @@ QUnit.test('basics', function () {
 	equal(div.getAttribute('foo'), 'bar');
 });
 
-QUnit.test('should remove `removed` events listener', function () {
-	QUnit.stop();
-	var origAddEventListener = domEvents.addEventListener;
-	var origRemoveEventListener = domEvents.removeEventListener;
+QUnit.test('should remove `removed` events listener', function (assert) {
+	var done = assert.async();
+	var onNodeRemoval = domMutate.onNodeRemoval;
 
-	domEvents.addEventListener = function () {
-		QUnit.ok(true, 'addEventListener called');
-		origAddEventListener.apply(this, arguments);
-		domEvents.addEventListener = origAddEventListener;
-	};
-
-	domEvents.removeEventListener = function () {
-		QUnit.ok(true, 'addEventListener called');
-		origRemoveEventListener.apply(this, arguments);
-		domEvents.removeEventListener = origRemoveEventListener;
-		QUnit.start();
+	domMutate.onNodeRemoval = function () {
+		assert.ok(true, 'addEventListener called');
+		var disposal = onNodeRemoval.apply(null, arguments);
+		domMutate.onNodeRemoval = onNodeRemoval;
+		return function () {
+			assert.ok(true, 'disposal function was called');
+			disposal();
+			done();
+		};
 	};
 
 	var div = document.createElement('div');
 	var text = new SimpleObservable('hello');
 
-	domMutate.appendChild.call(this.fixture, div);
+	domMutateNode.appendChild.call(this.fixture, div);
 	live.attrs(div, text);
-	domMutate.removeChild.call(this.fixture, div);
+	domMutateNode.removeChild.call(this.fixture, div);
 });
 
 testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
@@ -92,8 +89,8 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		new Set([text])
 	);
 
-	domEvents.addEventListener.call(div, 'removed', function checkTeardown() {
-		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
+	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+		undo();
 
 		assert.equal(
 			typeof canReflectDeps.getDependencyDataOf(div),

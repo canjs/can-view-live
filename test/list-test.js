@@ -8,9 +8,9 @@ var canReflect = require("can-reflect");
 var queues = require("can-queues");
 var fragment = require('can-util/dom/fragment/fragment');
 var NodeLists = require("can-view-nodelist");
-var domMutate = require('can-util/dom/mutate/mutate');
+var domMutate = require('can-dom-mutate');
+var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require("can-symbol");
-var domEvents = require('can-util/dom/events/events');
 var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
 
@@ -366,7 +366,7 @@ test("no memory leaks", function () {
 
 	QUnit.stop();
 	setTimeout(function(){
-		domMutate.removeChild.call(fixture,div);
+		domMutateNode.removeChild.call(fixture,div);
 		setTimeout(function () {
 			var handlers = map[canSymbol.for("can.meta")].handlers.get([]);
 			equal(handlers.length, 0, "there are no bindings");
@@ -400,8 +400,8 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		new Set([list])
 	);
 
-	domEvents.addEventListener.call(div, 'removed', function checkTeardown() {
-		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
+	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+		undo();
 
 		assert.equal(
 			typeof canReflectDeps.getDependencyDataOf(div),
