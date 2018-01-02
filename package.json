@@ -47,7 +47,7 @@
     ]
   },
   "dependencies": {
-    "can-dom-mutate": "git://github.com/canjs/can-dom-mutate.git#four",
+    "can-dom-mutate": "<2.0.0",
     "can-observation": "^4.0.0-pre.3",
     "can-queues": "<2.0.0",
     "can-reflect": "^1.10.2",
@@ -55,10 +55,10 @@
     "can-simple-observable": "^2.0.0-pre.3",
     "can-symbol": "^1.4.1",
     "can-util": "^3.9.6",
-    "can-view-callbacks": "git://github.com/canjs/can-view-callbacks.git#magneto",
-    "can-view-nodelist": "git://github.com/canjs/can-view-nodelist.git#magneto",
+    "can-view-callbacks": "^4.0.0-pre.9",
+    "can-view-nodelist": "^4.0.0-pre.5",
     "can-view-parser": "^4.0.0-pre.0",
-    "can-view-target": "git://github.com/canjs/can-view-target.git#magneto"
+    "can-view-target": "^4.0.0-pre.1"
   },
   "devDependencies": {
     "can-define": "^2.0.0-pre.7",
