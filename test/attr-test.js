@@ -2,8 +2,8 @@ var live = require('can-view-live');
 var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var domAttr = require("can-util/dom/attr/attr");
+var domMutate = require('can-dom-mutate');
 var SimpleObservable = require("can-simple-observable");
-var domEvents = require('can-util/dom/events/events');
 var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
 
@@ -79,8 +79,8 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		'should return the two SimpleObservable as dependencies'
 	);
 
-	domEvents.addEventListener.call(div, 'removed', function checkTeardown() {
-		domEvents.removeEventListener.call(div, 'removed', checkTeardown);
+	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+		undo();
 
 		assert.equal(
 			typeof canReflectDeps.getDependencyDataOf(div),

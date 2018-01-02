@@ -17,7 +17,8 @@ var platforms = [/*{
 	version: '11.0'
 }, */{
 	browserName: 'MicrosoftEdge',
-	platform: 'Windows 10'
+	platform: 'Windows 10',
+	version: 'latest'
 }, {
 	browserName: 'Safari',
 	'appium-version': '1.7.1',
