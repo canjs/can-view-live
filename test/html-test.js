@@ -84,7 +84,6 @@ QUnit.test("Works with Observations - .html", function(){
 testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", 1,function(){
 	var observable = new SimpleObservable("value");
 
-
 	var childObservation = new Observation(function child(){
 		QUnit.ok(true, "called child content once");
 		observable.get();
