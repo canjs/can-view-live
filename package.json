@@ -1,8 +1,8 @@
 {
   "name": "can-view-live",
-  "version": "3.2.5",
+  "version": "4.0.0-pre.22",
   "description": "",
-  "homepage": "http://canjs.com",
+  "homepage": "https://canjs.com/doc/can-view-live.html",
   "repository": {
     "type": "git",
     "url": "git://github.com/canjs/can-view-live.git"
@@ -15,12 +15,11 @@
   "scripts": {
     "ci": "npm test && node test/sauce-labs.js",
     "http-server": "http-server -p 3000 --silent",
-    "preversion": "npm test && npm run build",
-    "version": "git commit -am \"Update dist for release\" && git checkout -b release && git add -f dist/",
-    "postversion": "git push --tags && git checkout master && git branch -D release && git push",
+    "preversion": "npm test",
+    "postpublish": "git push --tags && git push",
     "testee": "testee test/test.html --browsers firefox",
     "test": "npm run detect-cycle && npm run jshint && npm run testee",
-    "jshint": "jshint lib/**/*.js --config",
+    "jshint": "jshint test/*.js lib/*.js --config",
     "release:pre": "npm version prerelease && npm publish --tag pre",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
@@ -48,26 +47,28 @@
     ]
   },
   "dependencies": {
-    "can-compute": "^3.3.1",
-    "can-event": "^3.6.0",
-    "can-observation": "^3.3.1",
-    "can-reflect": "^1.2.1",
-    "can-types": "^1.1.0",
+    "can-dom-mutate": "^1.0.0",
+    "can-observation": "^4.0.0",
+    "can-queues": "^1.0.0",
+    "can-reflect": "^1.10.2",
+    "can-reflect-dependencies": "^1.0.0",
+    "can-simple-observable": "^2.0.0",
+    "can-symbol": "^1.4.1",
     "can-util": "^3.9.6",
-    "can-view-callbacks": "^3.2.0",
-    "can-view-nodelist": "^3.1.0",
-    "can-view-parser": "^3.4.0",
-    "can-view-target": "^3.1.0"
+    "can-view-callbacks": "^4.0.0",
+    "can-view-nodelist": "^4.0.0",
+    "can-view-parser": "^4.0.0",
+    "can-view-target": "^4.0.0"
   },
   "devDependencies": {
-    "can-list": "^3.2.0",
-    "can-map": "^3.3.1",
+    "can-define": "^2.0.0",
+    "can-simple-map": "^4.0.0",
+    "can-test-helpers": "^1.1.0",
     "detect-cyclic-packages": "^1.1.0",
     "http-server": "^0.10.0",
     "jshint": "^2.9.1",
     "steal": "^1.2.10",
     "steal-qunit": "^1.0.1",
-    "steal-tools": "^1.1.2",
     "test-saucelabs": "0.0.3",
     "testee": "^0.7.0"
   }

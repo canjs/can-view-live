@@ -5,13 +5,12 @@ var List = require('can-list');
 var nodeLists = require('can-view-nodelist');
 var canBatch = require('can-event/batch/batch');
 var Observation = require("can-observation");
-var domEvents = require('can-util/dom/events/events');
 
 var QUnit = require('steal-qunit');
 
-var isEmptyObject = require('can-util/js/is-empty-object/is-empty-object');
+var domMutate = require('can-dom-mutate');
+var domMutateNode = require('can-dom-mutate/node');
 
-var domMutate = require('can-util/dom/mutate/mutate');
 var domAttr = require("can-util/dom/attr/attr");
 var fragment = require('can-util/dom/fragment/fragment');
 var makeArray = require('can-util/js/make-array/make-array');
@@ -89,30 +88,27 @@ test('attributes', function () {
 	equal(div.getAttribute('foo'), 'bar');
 });
 
-test('attributes - should remove `removed` events listener', function () {
-	QUnit.stop();
-	var origAddEventListener = domEvents.addEventListener;
-	var origRemoveEventListener = domEvents.removeEventListener;
+test('attributes - should stop listening for removal once removed', function (assert) {
+	var done = assert.async();
+	var onNodeRemoval = domMutate.onNodeRemoval;
 
-	domEvents.addEventListener = function () {
-		QUnit.ok(true, 'addEventListener called');
-		origAddEventListener.apply(this, arguments);
-		domEvents.addEventListener = origAddEventListener;
-	};
-
-	domEvents.removeEventListener = function () {
-		QUnit.ok(true, 'addEventListener called');
-		origRemoveEventListener.apply(this, arguments);
-		domEvents.removeEventListener = origRemoveEventListener;
-		QUnit.start();
+	domMutate.onNodeRemoval = function () {
+		assert.ok(true, 'addEventListener called');
+		var disposal = onNodeRemoval.apply(null, arguments);
+		domMutate.onNodeRemoval = onNodeRemoval;
+		return function () {
+			assert.ok(true, 'disposal function was called');
+			disposal();
+			done();
+		};
 	};
 
 	var div = document.createElement('div');
 	var text = compute('hello');
 
-	domMutate.appendChild.call(this.fixture, div);
+	domMutateNode.appendChild.call(this.fixture, div);
 	live.attrs(div, text);
-	domMutate.removeChild.call(this.fixture, div);
+	domMutateNode.removeChild.call(this.fixture, div);
 });
 
 test('attribute', function () {
@@ -233,10 +229,10 @@ test('text binding is memory safe (#666)', function () {
 		});
 	div.appendChild(span);
 
-	domMutate.appendChild.call(this.fixture, div);
+	domMutateNode.appendChild.call(this.fixture, div);
 
 	live.text(span, text, div);
-	domMutate.removeChild.call(this.fixture, div);
+	domMutateNode.removeChild.call(this.fixture, div);
 	stop();
 	setTimeout(function () {
 		ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
@@ -336,7 +332,7 @@ test('list and an falsey section (#1979)', function () {
 		template = function (num) {
 			return '<label>num=</label> <span>' + num + '</span>';
 		},
-		falseyTemplate = function (num) {
+		falseyTemplate = function () {
 			return '<p>NOTHING</p>';
 		};
 
@@ -370,7 +366,7 @@ test('list and an initial falsey section (#1979)', function(){
 		template = function (num) {
 			return '<label>num=</label> <span>' + num + '</span>';
 		},
-		falseyTemplate = function (num) {
+		falseyTemplate = function () {
 			return '<p>NOTHING</p>';
 		};
 
