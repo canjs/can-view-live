@@ -47,29 +47,28 @@
     ]
   },
   "dependencies": {
-    "can-dom-mutate": "<2.0.0",
-    "can-observation": "^4.0.0-pre.3",
-    "can-queues": "<2.0.0",
+    "can-dom-mutate": "^1.0.0",
+    "can-observation": "^4.0.0",
+    "can-queues": "^1.0.0",
     "can-reflect": "^1.10.2",
-    "can-reflect-dependencies": "<2.0.0",
-    "can-simple-observable": "^2.0.0-pre.3",
+    "can-reflect-dependencies": "^1.0.0",
+    "can-simple-observable": "^2.0.0",
     "can-symbol": "^1.4.1",
     "can-util": "^3.9.6",
-    "can-view-callbacks": "^4.0.0-pre.9",
-    "can-view-nodelist": "^4.0.0-pre.5",
-    "can-view-parser": "^4.0.0-pre.0",
-    "can-view-target": "^4.0.0-pre.1"
+    "can-view-callbacks": "^4.0.0",
+    "can-view-nodelist": "^4.0.0",
+    "can-view-parser": "^4.0.0",
+    "can-view-target": "^4.0.0"
   },
   "devDependencies": {
-    "can-define": "^2.0.0-pre.7",
-    "can-simple-map": "^4.0.0-pre.2",
+    "can-define": "^2.0.0",
+    "can-simple-map": "^4.0.0",
     "can-test-helpers": "^1.1.0",
     "detect-cyclic-packages": "^1.1.0",
     "http-server": "^0.10.0",
     "jshint": "^2.9.1",
     "steal": "^1.2.10",
     "steal-qunit": "^1.0.1",
-    "steal-tools": "^1.1.2",
     "test-saucelabs": "0.0.3",
     "testee": "^0.7.0"
   }
