@@ -1,8 +1,8 @@
 var live = require('can-view-live');
 var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
-var domAttr = require("can-util/dom/attr/attr");
 var domMutate = require('can-dom-mutate');
+var domMutateNode = require('can-dom-mutate/node');
 var SimpleObservable = require("can-simple-observable");
 var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
@@ -53,7 +53,7 @@ QUnit.test("can.live.attr works with non-string attributes (#1790)", function() 
 			return 2;
 		});
 
-	domAttr.set(el, "value", 1);
+	domMutateNode.setAttribute.call(el, "value", 1);
 	live.attr(el, 'value', attrCompute);
 	ok(true, 'No exception thrown.');
 });
