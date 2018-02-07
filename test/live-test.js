@@ -6,6 +6,7 @@ var nodeLists = require('can-view-nodelist');
 var canBatch = require('can-event/batch/batch');
 var Observation = require("can-observation");
 var domEvents = require('can-util/dom/events/events');
+var canReflect = require('can-reflect');
 
 var QUnit = require('steal-qunit');
 
@@ -639,3 +640,34 @@ QUnit.test("events are torn down from correct list on change", function() {
 	ok(filteredList.__bindEvents.add && filteredList.__bindEvents.add.length > 0, "Add handler has been added to filteredList");
 });
 
+test("no memory leaks with replacements (#93)", function () {
+
+	var div = document.createElement('div'),
+		animals = new List([
+			'bear',
+			'turtle'
+		]),
+		template = function (animal) {
+			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
+		};
+	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
+	var htmlNodeList = canReflect.toArray(div.childNodes);
+	nodeLists.register(htmlNodeList, function(){}, true);
+
+	var el = div.getElementsByTagName('span')[0];
+
+	this.fixture.appendChild(div);
+	var nodeList = [el];
+	nodeLists.register(nodeList, function(){}, htmlNodeList);
+	live.list(el, animals, template, {}, this.fixture, nodeList);
+
+	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
+
+	animals.push("foo");
+
+	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
+
+	animals.shift();
+
+	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
+});
