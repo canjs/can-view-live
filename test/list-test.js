@@ -414,3 +414,35 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 
 	div.remove();
 });
+
+test("no memory leaks with replacements (#93)", function () {
+
+	var div = document.createElement('div'),
+		animals = new DefineList([
+			'bear',
+			'turtle'
+		]),
+		template = function (animal) {
+			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
+		};
+	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
+	var htmlNodeList = canReflect.toArray(div.childNodes);
+	NodeLists.register(htmlNodeList, function(){}, true);
+
+	var el = div.getElementsByTagName('span')[0];
+
+	this.fixture.appendChild(div);
+	var nodeList = [el];
+	NodeLists.register(nodeList, function(){}, htmlNodeList);
+	live.list(el, animals, template, {}, this.fixture, nodeList);
+
+	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
+
+	animals.push("foo");
+
+	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
+
+	animals.shift();
+
+	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
+});
