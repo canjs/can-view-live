@@ -52,7 +52,7 @@
     "can-queues": "^1.0.0",
     "can-reflect": "^1.10.2",
     "can-reflect-dependencies": "^1.0.0",
-    "can-simple-observable": "^2.0.0",
+    "can-simple-observable": "^2.0.2",
     "can-symbol": "^1.4.1",
     "can-util": "^3.9.6",
     "can-view-callbacks": "^4.0.0",
