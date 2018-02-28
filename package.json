@@ -47,6 +47,7 @@
     ]
   },
   "dependencies": {
+    "can-attribute-observable": "^0.1.0",
     "can-dom-mutate": "^1.0.0",
     "can-observation": "^4.0.0",
     "can-queues": "^1.0.0",

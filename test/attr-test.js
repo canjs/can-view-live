@@ -94,3 +94,20 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	// remove element from the DOM
 	div.remove();
 });
+
+QUnit.test("can.live.attr works with value (#96)", function() {
+	var el = document.createElement('input'),
+		attrObservable = new SimpleObservable("Hello");
+
+	live.attr(el, 'value', attrObservable);
+	equal(el.value, "Hello", "Hello");
+
+	attrObservable.set("Hi");
+	equal(el.value, "Hi", "Hi");
+
+	el.value = "Hey";
+	equal(el.value, "Hey", "Hey");
+
+	attrObservable.set("Aloha");
+	equal(el.value, "Aloha", "Aloha");
+});
