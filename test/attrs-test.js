@@ -62,7 +62,7 @@ QUnit.test('should remove `removed` events listener', function (assert) {
 
 testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	var done = assert.async();
-	assert.expect(2);
+	assert.expect(3);
 
 	var div = document.createElement('div');
 	document.body.appendChild(div);
@@ -86,7 +86,18 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 			.whatChangesMe
 			.mutate
 			.valueDependencies,
-		new Set([text])
+		new Set([text]),
+		'getDependencyDataOf(<div>) should return the observation as a dependency'
+	);
+
+	assert.deepEqual(
+		canReflectDeps
+			.getDependencyDataOf(text)
+			.whatIChange
+			.mutate
+			.valueDependencies,
+		new Set([div]),
+		'getDependencyDataOf(observation) should return the div as a dependency'
 	);
 
 	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
