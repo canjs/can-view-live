@@ -5,6 +5,8 @@ var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
 var NodeLists = require("can-view-nodelist");
 var testHelpers = require('can-test-helpers');
+var domMutate = require('can-dom-mutate');
+var canReflectDeps = require('can-reflect-dependencies');
 
 QUnit.module("can-view-live.html");
 
@@ -48,7 +50,6 @@ test('html live binding handles getting a function from a compute',5, function()
 			return handler;
 		}
 	});
-
 
 	live.html(placeholder, html, div);
 
@@ -117,6 +118,54 @@ testHelpers.dev.devOnlyTest("child elements must disconnect before parents can r
 	live.html(parentTextNode, parentObservation, div, htmlNodeList);
 
 	observable.set("VALUE");
+});
 
+testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
+	var done = assert.async();
+	assert.expect(3);
 
+	var div = document.createElement('div'),
+		span = document.createElement('span');
+
+	div.appendChild(span);
+	document.body.appendChild(div);
+
+	var html = new Observation(function() {
+		return '<p>Hello</p>';
+	});
+	live.html(span, html, div);
+
+	assert.deepEqual(
+		canReflectDeps
+			.getDependencyDataOf(div)
+			.whatChangesMe
+			.mutate
+			.valueDependencies,
+		new Set([html]),
+		'whatChangesMe(<div>) shows the observation'
+	);
+
+	assert.deepEqual(
+		canReflectDeps
+			.getDependencyDataOf(html)
+			.whatIChange
+			.derive
+			.valueDependencies,
+		new Set([div]),
+		'whatChangesMe(<observation>) shows the div'
+	);
+
+	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+		undo();
+
+		assert.equal(
+			typeof canReflectDeps.getDependencyDataOf(div),
+			'undefined',
+			'dependencies should be clear out when elements is removed'
+		);
+
+		done();
+	});
+
+	div.remove();
 });

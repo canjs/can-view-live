@@ -60,7 +60,7 @@ QUnit.test("can.live.attr works with non-string attributes (#1790)", function() 
 
 testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	var done = assert.async();
-	assert.expect(2);
+	assert.expect(4);
 
 	var div = document.createElement('div');
 	document.body.appendChild(div);
@@ -71,12 +71,34 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	live.attr(div, 'id', id);
 	live.attr(div, 'title', title);
 
-	var divDeps = canReflectDeps.getDependencyDataOf(div).whatChangesMe;
+	assert.deepEqual(
+		canReflectDeps
+			.getDependencyDataOf(div)
+			.whatChangesMe
+			.mutate
+			.valueDependencies,
+		new Set([id, title]),
+		'getDependencyDataOf(<div>) should return the two SimpleObservables as dependencies'
+	);
 
 	assert.deepEqual(
-		divDeps.mutate.valueDependencies,
-		new Set([id, title]),
-		'should return the two SimpleObservable as dependencies'
+		canReflectDeps
+			.getDependencyDataOf(id)
+			.whatIChange
+			.derive
+			.valueDependencies,
+		new Set([div]),
+		'getDependencyDataOf(id) should return the <div> as a dependency'
+	);
+
+	assert.deepEqual(
+		canReflectDeps
+			.getDependencyDataOf(title)
+			.whatIChange
+			.derive
+			.valueDependencies,
+		new Set([div]),
+		'getDependencyDataOf(title) should return the <div> as a dependency'
 	);
 
 	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
