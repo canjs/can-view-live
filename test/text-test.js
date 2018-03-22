@@ -62,7 +62,7 @@ QUnit.test('text binding is memory safe (#666)', function() {
 
 testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	var done = assert.async();
-	assert.expect(2);
+	assert.expect(3);
 
 	var div = document.createElement('div');
 	var span = document.createElement('span');
@@ -87,7 +87,18 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 			.whatChangesMe
 			.mutate
 			.valueDependencies,
-		new Set([text])
+		new Set([text]),
+		'whatChangesMe(<div>) shows the observation'
+	);
+
+	assert.deepEqual(
+		canReflectDeps
+			.getDependencyDataOf(text)
+			.whatIChange
+			.mutate
+			.valueDependencies,
+		new Set([div]),
+		'whatChangesMe(observation) shows the <div>'
 	);
 
 	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
