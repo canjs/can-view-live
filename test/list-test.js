@@ -446,3 +446,27 @@ test("no memory leaks with replacements (#93)", function () {
 
 	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
 });
+
+test("Tears down lists when outer observation is removed", function() {
+	var div = document.createElement("div");
+	var animals = new DefineList(['dog', 'cat', 'turtle']);
+
+	var observable = new Observation(function(){
+
+	});
+
+	var template = function(animal) {
+		return '<label>Animal</label> <span>' + animal.get() + '</span>';
+	};
+
+	div.innerHTML = 'fun animals: <span></span>';
+	var el = div.getElementsByTagName('span')[0];
+
+	this.fixture.appendChild(div);
+
+	live.list(el, animals, template, {}, this.fixture, null);
+
+	console.log(div);
+
+
+});

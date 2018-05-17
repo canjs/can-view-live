@@ -48,8 +48,10 @@
   },
   "dependencies": {
     "can-attribute-observable": "^0.2.1",
+    "can-diff": "file:../can-diff",
     "can-dom-mutate": "^1.0.0",
     "can-observation": "^4.0.0",
+    "can-observation-recorder": "file:../can-observation-recorder",
     "can-queues": "^1.0.0",
     "can-reflect": "^1.10.2",
     "can-reflect-dependencies": "^1.0.0",
