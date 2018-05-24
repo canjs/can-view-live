@@ -11,9 +11,7 @@ var QUnit = require('steal-qunit');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 
-var domAttr = require("can-util/dom/attr/attr");
-var fragment = require('can-util/dom/fragment/fragment');
-var makeArray = require('can-util/js/make-array/make-array');
+var fragment = require('can-fragment');
 
 QUnit.module('can-view-live',{
 	setup: function(){
@@ -322,7 +320,7 @@ test("can.live.attr works with non-string attributes (#1790)", function() {
 			return 2;
 		});
 
-	domAttr.set(el, "value", 1);
+	domMutateNode.setAttribute(el, "value", 1);
 	live.attr(el, 'value', attrCompute);
 	ok(true, 'No exception thrown.');
 });
@@ -463,10 +461,10 @@ test('changing items in a live.list after it has been unregistered works (#55)',
 	});
 
 	// set up nodelists
-	var htmlNodeList = makeArray(fragment("<div></div>").childNodes);
+	var htmlNodeList = canReflect.toArray(fragment("<div></div>").childNodes);
 	nodeLists.register(htmlNodeList, function(){}, true);
 
-	var listNodeList = makeArray(fragment("<div></div>").childNodes);
+	var listNodeList = canReflect.toArray(fragment("<div></div>").childNodes);
 	nodeLists.register(listNodeList, function(){}, htmlNodeList, true);
 
 	// set up elements
@@ -634,4 +632,3 @@ QUnit.test("events are torn down from correct list on change", function() {
 	ok(!list.__bindEvents.add || list.__bindEvents.add.length === 0, "Add handler has been removed from list");
 	ok(filteredList.__bindEvents.add && filteredList.__bindEvents.add.length > 0, "Add handler has been added to filteredList");
 });
-
