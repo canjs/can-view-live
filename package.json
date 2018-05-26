@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "can-define": "^2.0.0",
-    "can-simple-map": "^4.0.0",
+    "can-simple-map": "^4.1.1",
     "can-test-helpers": "^1.1.0",
     "detect-cyclic-packages": "^1.1.0",
     "http-server": "^0.10.0",
