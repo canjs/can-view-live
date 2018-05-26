@@ -51,7 +51,7 @@
     "can-child-nodes": "^1.0.0",
     "can-diff": "^1.0.1",
     "can-dom-mutate": "^1.0.0",
-    "can-fragment": "^1.0.0",
+    "can-fragment": "^1.0.1",
     "can-observation": "^4.0.0",
     "can-queues": "^1.0.0",
     "can-reflect": "^1.10.2",
