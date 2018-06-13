@@ -7,6 +7,8 @@ var NodeLists = require("can-view-nodelist");
 var testHelpers = require('can-test-helpers');
 var domMutate = require('can-dom-mutate');
 var canReflectDeps = require('can-reflect-dependencies');
+var fragment = require("can-fragment");
+var queues = require("can-queues");
 
 QUnit.module("can-view-live.html");
 
@@ -168,4 +170,29 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	});
 
 	div.remove();
+});
+
+QUnit.test(".html works inside a .list (can-stache#542)", function(){
+	var div = document.createElement('div'),
+		span = document.createElement('span');
+	div.appendChild(span);
+
+	var itemNodeList = NodeLists.register([span]);
+	var listNodeList = NodeLists.register([itemNodeList]);
+
+
+	var content = new SimpleObservable( fragment("<p>Hello</p>") );
+
+	live.html(span, content, div, itemNodeList);
+
+	// force a change, but something else will have already responded
+	queues.batch.start();
+	content.set( fragment("<span>Goodbye</span>") );
+	// NodeList has been updated immediately, but the DOM isn't up to date
+	queues.domUIQueue.enqueue(function(){
+		var itemNodeList = listNodeList[0];
+		QUnit.equal( div.firstChild, itemNodeList[0], "the DOM and nodeList should be in sync");
+	});
+
+	queues.batch.stop();
 });
