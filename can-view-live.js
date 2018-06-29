@@ -1,3 +1,4 @@
+"use strict";
 var live = require("./lib/core");
 require("./lib/attr");
 require("./lib/attrs");
