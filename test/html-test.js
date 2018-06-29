@@ -7,6 +7,7 @@ var NodeLists = require("can-view-nodelist");
 var testHelpers = require('can-test-helpers');
 var domMutate = require('can-dom-mutate');
 var canReflectDeps = require('can-reflect-dependencies');
+var canSymbol = require('can-symbol');
 var fragment = require("can-fragment");
 var queues = require("can-queues");
 
@@ -82,6 +83,26 @@ QUnit.test("Works with Observations - .html", function(){
 	equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
 	equal(div.getElementsByTagName('label').length, 3);
+});
+
+test("html live binding handles objects with can.viewInsert symbol", 2, function(assert) {
+	var div = document.createElement("div");
+	var options = {};
+	var placeholder = document.createTextNode("Placeholder text");
+	div.appendChild(placeholder);
+
+	var html = new Observation(function() {
+		return {
+			[canSymbol.for("can.viewInsert")]: function() {
+				assert.equal(arguments[0], options, "options were passed to symbol function");
+				return document.createTextNode("Replaced text");
+			}
+		};
+	});
+
+	live.html(placeholder, html, div, options);
+
+	assert.equal(div.textContent, "Replaced text", "symbol function called");
 });
 
 testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", 1,function(){
