@@ -54,7 +54,7 @@
     "can-fragment": "^1.0.0",
     "can-observation": "^4.0.0",
     "can-queues": "^1.0.0",
-    "can-reflect": "^1.10.2",
+    "can-reflect": "^1.17.4",
     "can-reflect-dependencies": "^1.0.0",
     "can-simple-observable": "^2.0.0",
     "can-symbol": "^1.4.1",
