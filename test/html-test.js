@@ -92,12 +92,12 @@ test("html live binding handles objects with can.viewInsert symbol", 2, function
 	div.appendChild(placeholder);
 
 	var html = new Observation(function() {
-		return {
-			[canSymbol.for("can.viewInsert")]: function() {
-				assert.equal(arguments[0], options, "options were passed to symbol function");
-				return document.createTextNode("Replaced text");
-			}
+		var d = {};
+		d[canSymbol.for("can.viewInsert")] = function() {
+			assert.equal(arguments[0], options, "options were passed to symbol function");
+			return document.createTextNode("Replaced text");
 		};
+		return d;
 	});
 
 	live.html(placeholder, html, div, options);
