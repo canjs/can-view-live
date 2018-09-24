@@ -230,7 +230,7 @@ QUnit.test(".html works if it is enqueued twice", function(){
 		html.set(fragment("<p>3</p>"));
 	},null,[]);
 
-	html.set(fragment("<p>2</p>"))
+	html.set(fragment("<p>2</p>"));
 	queues.batch.stop();
 	QUnit.ok(true, "got here without an error");
 
