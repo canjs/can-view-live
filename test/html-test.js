@@ -217,3 +217,24 @@ QUnit.test(".html works inside a .list (can-stache#542)", function(){
 
 	queues.batch.stop();
 });
+
+QUnit.test(".html works if it is enqueued twice", function(){
+	// enqueue in domUI right away and change again in there
+	var div = fragment("<div>PLACEHOLDER</div>").firstChild;
+	var html = new SimpleObservable(fragment("<p>1</p>"));
+
+	live.html(div.firstChild, html, div);
+
+	queues.batch.start();
+	queues.domUIQueue.enqueue(function setHTMLTO3(){
+		html.set(fragment("<p>3</p>"));
+	},null,[]);
+
+	html.set(fragment("<p>2</p>"))
+	queues.batch.stop();
+	QUnit.ok(true, "got here without an error");
+
+	QUnit.deepEqual(div.innerHTML.toLowerCase(), "<p>3</p>");
+
+
+});
