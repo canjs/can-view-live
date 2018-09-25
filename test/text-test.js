@@ -7,6 +7,7 @@ var domMutateNode = require('can-dom-mutate/node');
 var nodeLists = require('can-view-nodelist');
 var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
+var canGlobals = require('can-globals');
 
 QUnit.module("can-view-live.text", {
 	setup: function() {
@@ -114,4 +115,26 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	});
 
 	div.remove();
+});
+
+QUnit.test("Removing the documentElement tears down correctly", function(assert) {
+	var done = assert.async();
+	assert.expect(1);
+
+	var realDoc = canGlobals.getKeyValue('document');
+	var doc = document.implementation.createHTMLDocument("testing");
+	canGlobals.setKeyValue('document', doc);
+	var tn = doc.createTextNode("foo");
+
+	domMutate.onNodeRemoval(doc.body, function() {
+		canGlobals.setKeyValue('document', realDoc);
+		assert.ok(true, 'Removal fired');
+		done();
+	});
+
+	var text = new Observation(function() { return "foo"; });
+
+	domMutateNode.appendChild.call(doc.body, tn);
+	live.text(tn, text, doc.body);
+	domMutateNode.removeChild.call(doc, doc.documentElement);
 });
