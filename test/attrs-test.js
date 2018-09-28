@@ -114,3 +114,34 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 
 	div.remove();
 });
+
+if(window.document && document.contains) {
+	QUnit.test('use document contains if possible', function (assert) {
+		var done = assert.async();
+		// overwrite domMutate call
+		var onNodeRemoval = domMutate.onNodeRemoval;
+		domMutate.onNodeRemoval = function () {
+			var disposal = onNodeRemoval.apply(null, arguments);
+			domMutate.onNodeRemoval = onNodeRemoval;
+			return function () {
+				disposal();
+				done();
+			};
+		};
+		// overwrite document.contains
+		var contains = document.contains;
+		document.contains = function(){
+			assert.ok(true, "contains was called");
+			var result = contains.apply(this, arguments);
+			document.contains = contains;
+			return result;
+		};
+
+		var div = document.createElement('div');
+		var text = new SimpleObservable('hello');
+
+		domMutateNode.appendChild.call(this.fixture, div);
+		live.attrs(div, text);
+		domMutateNode.removeChild.call(this.fixture, div);
+	});
+}
