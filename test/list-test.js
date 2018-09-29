@@ -13,6 +13,22 @@ var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require("can-symbol");
 var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
+var globals = require("can-globals");
+
+
+// This is a helper from can-stache-bindings
+function afterMutation(cb) {
+	var doc = globals.getKeyValue('document');
+	var div = doc.createElement("div");
+	var undo = domMutate.onNodeInsertion(div, function () {
+		undo();
+		doc.body.removeChild(div);
+		setTimeout(cb, 5);
+	});
+	setTimeout(function () {
+		domMutateNode.appendChild.call(doc.body, div);
+	}, 10);
+}
 
 QUnit.module("can-view-live.list",{
 	setup: function(){
@@ -365,13 +381,15 @@ test("no memory leaks", function () {
 
 
 	QUnit.stop();
+
+
 	setTimeout(function(){
 		domMutateNode.removeChild.call(fixture,div);
-		setTimeout(function () {
+		afterMutation(function () {
 			var handlers = map[canSymbol.for("can.meta")].handlers.get([]);
 			equal(handlers.length, 0, "there are no bindings");
 			start();
-		}, 50);
+		});
 	},10);
 });
 
