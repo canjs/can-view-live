@@ -382,14 +382,19 @@ test("no memory leaks", function () {
 
 	QUnit.stop();
 
-
-	setTimeout(function(){
-		domMutateNode.removeChild.call(fixture,div);
-		afterMutation(function () {
-			var handlers = map[canSymbol.for("can.meta")].handlers.get([]);
+	// poll until there are no handlers
+	function checkHandlers(){
+		var handlers = map[canSymbol.for("can.meta")].handlers.get([]);
+		if(handlers.length === 0) {
 			equal(handlers.length, 0, "there are no bindings");
 			start();
-		});
+		} else {
+			setTimeout(checkHandlers,10);
+		}
+	}
+	setTimeout(function(){
+		domMutateNode.removeChild.call(fixture,div);
+		afterMutation(checkHandlers);
 	},10);
 });
 
