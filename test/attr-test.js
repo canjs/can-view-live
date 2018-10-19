@@ -114,7 +114,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	});
 
 	// remove element from the DOM
-	div.remove();
+	div.parentNode.removeChild(div);
 });
 
 QUnit.test("can.live.attr works with value (#96)", function() {

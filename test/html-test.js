@@ -13,29 +13,6 @@ var queues = require("can-queues");
 
 QUnit.module("can-view-live.html");
 
-/**
- * ChildNode.remove polyfill for IE 11 compatibility
- * https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove#Polyfill
- */
-(function (arr) {
-	arr.forEach(function (item) {
-		if (item.hasOwnProperty('remove')) {
-			return;
-		}
-		Object.defineProperty(item, 'remove', {
-			configurable: true,
-			enumerable: true,
-			writable: true,
-			value: function remove() {
-			  if (this.parentNode !== null) {
-				  this.parentNode.removeChild(this);
-			  }
-			}
-		  });
-		});
-})([Element.prototype]);
-
-
 test('basics', function () {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
@@ -215,7 +192,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		done();
 	});
 
-	div.remove();
+	div.parentNode.removeChild(div);
 });
 
 QUnit.test(".html works inside a .list (can-stache#542)", function(){
