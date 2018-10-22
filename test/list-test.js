@@ -435,7 +435,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		done();
 	});
 
-	div.remove();
+	div.parentNode.removeChild(div);
 });
 
 test("no memory leaks with replacements (#93)", function () {

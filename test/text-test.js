@@ -114,7 +114,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		done();
 	});
 
-	div.remove();
+	div.parentNode.removeChild(div);
 });
 
 QUnit.test("Removing the documentElement tears down correctly", function(assert) {

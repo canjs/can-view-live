@@ -13,7 +13,6 @@ var queues = require("can-queues");
 
 QUnit.module("can-view-live.html");
 
-
 test('basics', function () {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
@@ -144,6 +143,9 @@ testHelpers.dev.devOnlyTest("child elements must disconnect before parents can r
 });
 
 testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
+
+	
+
 	var done = assert.async();
 	assert.expect(3);
 
@@ -190,7 +192,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		done();
 	});
 
-	div.remove();
+	div.parentNode.removeChild(div);
 });
 
 QUnit.test(".html works inside a .list (can-stache#542)", function(){

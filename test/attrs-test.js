@@ -112,7 +112,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		done();
 	});
 
-	div.remove();
+	div.parentNode.removeChild(div);
 });
 
 if(window.document && document.contains) {
