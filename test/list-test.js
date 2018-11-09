@@ -469,3 +469,34 @@ test("no memory leaks with replacements (#93)", function () {
 
 	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
 });
+
+
+test("Undefined list and teardown", function () {
+	var div = document.createElement('div'),
+		map = new SimpleMap({
+			items: undefined
+		}),
+		template = function () { return ''; };
+	var listObservation = new Observation(function () {
+		return map.attr('items');
+	});
+	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
+	var el = div.getElementsByTagName('span')[0];
+	this.fixture.appendChild(div);
+	var fixture = this.fixture;
+
+	live.list(el, listObservation, template, {});
+
+
+	QUnit.stop();
+
+	// poll until there are no handlers
+	function checkHandlers(){
+		QUnit.ok(true, "was able to teardown");
+		QUnit.start();
+	}
+	setTimeout(function(){
+		domMutateNode.removeChild.call(fixture,div);
+		afterMutation(checkHandlers);
+	},10);
+});
