@@ -5,9 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/canjs/can-view-live/blob/master/LICENSE.md)
 [![npm version](https://badge.fury.io/js/can-view-live.svg)](https://www.npmjs.com/package/can-view-live)
 [![Travis build status](https://travis-ci.org/canjs/can-view-live.svg?branch=master)](https://travis-ci.org/canjs/can-view-live)
-[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/canjs/can-view-live?branch=master&svg=true)](https://ci.appveyor.com/project/matthewp/can-view-live)
-[![Coverage status](https://coveralls.io/repos/github/canjs/can-view-live/badge.svg?branch=master)](https://coveralls.io/github/canjs/can-view-live?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-view-live.svg)](https://greenkeeper.io/)
+
+[![Sauce Labs Test Status](https://saucelabs.com/browser-matrix/can-view-live.svg)](https://saucelabs.com/u/can-view-live)
 
 Setup live-binding between the DOM and a compute manually.
 
