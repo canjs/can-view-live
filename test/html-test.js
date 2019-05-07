@@ -16,11 +16,13 @@ QUnit.module("can-view-live.html");
 test('basics', function () {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
+
 	div.appendChild(span);
 	var items = new DefineList([
 		'one',
 		'two'
 	]);
+
 	var html = new Observation(function itemsHTML() {
 		var html = '';
 		items.forEach(function (item) {
@@ -103,48 +105,50 @@ test("html live binding handles objects with can.viewInsert symbol", 2, function
 
 	assert.equal(div.textContent, "Replaced text", "symbol function called");
 });
-
-testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", 1,function(){
+/*
+testHelpers.dev.devOnlyTest*/
+QUnit.only("child elements must disconnect before parents can re-evaluate", 1,function(){
 	var observable = new SimpleObservable("value");
 
+	// this observation should run once ...
 	var childObservation = new Observation(function child(){
 		QUnit.ok(true, "called child content once");
 		observable.get();
 		return "CHILD CONTENT";
-	},null, {priority: 1});
+	});
 
-	var htmlNodeList= [];
-
+	// PARENT OBSERVATION ... should be notified and teardown CHILD OBSERVATION
 	var parentObservation = new Observation(function parent(){
 		var result = observable.get();
 		if(result === "value") {
 			var childTextNode = document.createTextNode('');
 			var childFrag = document.createDocumentFragment();
 			childFrag.appendChild(childTextNode);
-			var nodeList = [childTextNode];
 
-			NodeLists.register(nodeList, null, htmlNodeList, true);
-			live.html(childTextNode, childObservation, null, nodeList);
+			// CHILD OBSERVATION
+			live.html(childTextNode, childObservation);
+
 			return childFrag;
 		} else {
 			return "NEW CONTENT";
 		}
-	},null,{priority: 0});
+	});
 
 	var parentTextNode = document.createTextNode('');
 	var div = document.createElement('div');
+	//document.body.appendChild(div);
 	div.appendChild(parentTextNode);
-	htmlNodeList.push(parentTextNode);
 
-	NodeLists.register(htmlNodeList, function(){}, true, true);
-	live.html(parentTextNode, parentObservation, div, htmlNodeList);
+	//window.queues = queues;
 
+	live.html(parentTextNode, parentObservation);
+	//queues.log("flush");
 	observable.set("VALUE");
 });
 
 testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 
-	
+
 
 	var done = assert.async();
 	assert.expect(3);
@@ -180,7 +184,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		'whatChangesMe(<observation>) shows the div'
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
 
 		assert.equal(
