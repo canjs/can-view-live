@@ -10,7 +10,7 @@ var canReflectDeps = require('can-reflect-dependencies');
 var canGlobals = require('can-globals');
 
 QUnit.module("can-view-live.text", {
-	setup: function() {
+	beforeEach: function(assert) {
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });
@@ -21,7 +21,7 @@ var esc = function(str) {
 		.replace(/>/g, '&gt;');
 };
 
-QUnit.test('text', function() {
+QUnit.test('text', function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -35,12 +35,12 @@ QUnit.test('text', function() {
 		return html;
 	});
 	live.text(span, text, div);
-	equal(div.innerHTML, esc('<label>one</label><label>two</label>'));
+	assert.equal(div.innerHTML, esc('<label>one</label><label>two</label>'));
 	value.set(['one', 'two', 'three']);
-	equal(div.innerHTML, esc('<label>one</label><label>two</label><label>three</label>'));
+	assert.equal(div.innerHTML, esc('<label>one</label><label>two</label><label>three</label>'));
 });
 
-QUnit.test('text binding is memory safe (#666)', function() {
+QUnit.test('text binding is memory safe (#666)', function(assert) {
 	nodeLists.nodeMap.clear();
 
 	var div = document.createElement('div'),
@@ -54,10 +54,10 @@ QUnit.test('text binding is memory safe (#666)', function() {
 
 	live.text(span, text, div);
 	domMutateNode.removeChild.call(this.fixture, div);
-	stop();
+	var done = assert.async();
 	setTimeout(function() {
-		ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
-		start();
+		assert.ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
+		done();
 	}, 100);
 });
 

@@ -15,12 +15,12 @@ var domMutateNode = require('can-dom-mutate/node');
 var fragment = require('can-fragment');
 
 QUnit.module('can-view-live',{
-	setup: function(){
+	beforeEach: function(assert) {
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });
 
-test('html', function () {
+QUnit.test('html', function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -36,16 +36,16 @@ test('html', function () {
 		return html;
 	});
 	live.html(span, html, div);
-	equal(div.getElementsByTagName('label').length, 2);
+	assert.equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
-	equal(div.getElementsByTagName('label').length, 3);
+	assert.equal(div.getElementsByTagName('label').length, 3);
 });
 var esc = function (str) {
 	return str.replace(/</g, '&lt;')
 		.replace(/>/g, '&gt;');
 };
 
-test('text', function () {
+QUnit.test('text', function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -61,12 +61,12 @@ test('text', function () {
 		return html;
 	});
 	live.text(span, text, div);
-	equal(div.innerHTML, esc('<label>one</label><label>two</label>'));
+	assert.equal(div.innerHTML, esc('<label>one</label><label>two</label>'));
 	items.push('three');
-	equal(div.innerHTML, esc('<label>one</label><label>two</label><label>three</label>'));
+	assert.equal(div.innerHTML, esc('<label>one</label><label>two</label><label>three</label>'));
 });
 
-test('attributes', function () {
+QUnit.test('attributes', function(assert) {
 	var div = document.createElement('div');
 	var items = new List([
 		'class',
@@ -80,14 +80,14 @@ test('attributes', function () {
 		return html;
 	});
 	live.attrs(div, text);
-	equal(div.className, 'foo');
+	assert.equal(div.className, 'foo');
 	items.splice(0, 2);
-	equal(div.className, '');
+	assert.equal(div.className, '');
 	items.push('foo', 'bar');
-	equal(div.getAttribute('foo'), 'bar');
+	assert.equal(div.getAttribute('foo'), 'bar');
 });
 
-test('attributes - should stop listening for removal once removed', function (assert) {
+QUnit.test('attributes - should stop listening for removal once removed', function (assert) {
 	var done = assert.async();
 	var onNodeRemoval = domMutate.onNodeRemoval;
 
@@ -110,7 +110,7 @@ test('attributes - should stop listening for removal once removed', function (as
 	domMutateNode.removeChild.call(this.fixture, div);
 });
 
-test('attribute', function () {
+QUnit.test('attribute', function(assert) {
 	var div = document.createElement('div');
 
 	var firstObject = new Map({});
@@ -127,24 +127,24 @@ test('attribute', function () {
 
 	live.attr(div, 'class', className);
 
-	equal(div.className, 'foo   end');
+	assert.equal(div.className, 'foo   end');
 	firstObject.attr('selected', true);
-	equal(div.className, 'foo selected  end');
+	assert.equal(div.className, 'foo selected  end');
 	secondObject.attr('active', true);
-	equal(div.className, 'foo selected active end');
+	assert.equal(div.className, 'foo selected active end');
 	firstObject.attr('selected', false);
-	equal(div.className, 'foo  active end');
+	assert.equal(div.className, 'foo  active end');
 });
 
-test('specialAttribute with new line', function () {
+QUnit.test('specialAttribute with new line', function(assert) {
 	var div = document.createElement('div');
 	var style = compute('width: 50px;\nheight:50px;');
 	live.attr(div, 'style', style);
-	equal(div.style.height, '50px');
-	equal(div.style.width, '50px');
+	assert.equal(div.style.height, '50px');
+	assert.equal(div.style.width, '50px');
 });
 
-test('list', function () {
+QUnit.test('list', function(assert) {
 	var div = document.createElement('div'),
 		list = new List([
 			'sloth',
@@ -156,15 +156,15 @@ test('list', function () {
 	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
 	live.list(el, list, template, {});
-	equal(div.getElementsByTagName('label')
+	assert.equal(div.getElementsByTagName('label')
 		.length, 2, 'There are 2 labels');
 	div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
 	list.push('turtle');
-	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
-	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
+	assert.equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
+	assert.equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
 });
 
-test('list within a compute', function () {
+QUnit.test('list within a compute', function(assert) {
 	var div = document.createElement('div'),
 		map = new Map({
 			animals: [
@@ -181,15 +181,15 @@ test('list within a compute', function () {
 	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
 	live.list(el, listCompute, template, {});
-	equal(div.getElementsByTagName('label')
+	assert.equal(div.getElementsByTagName('label')
 		.length, 2, 'There are 2 labels');
 	div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
 
 	map.attr('animals')
 		.push('turtle');
 
-	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
-	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
+	assert.equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
+	assert.equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
 
 	map.attr('animals', new List([
 		'sloth',
@@ -197,11 +197,11 @@ test('list within a compute', function () {
 		'turtle'
 	]));
 	var spans = div.getElementsByTagName('span');
-	equal(spans.length, 3, 'there are 3 spans');
-	ok(!div.getElementsByTagName('label')[0].myexpando, 'no expando');
+	assert.equal(spans.length, 3, 'there are 3 spans');
+	assert.ok(!div.getElementsByTagName('label')[0].myexpando, 'no expando');
 });
 
-test('list with a compute that returns a list', function () {
+QUnit.test('list with a compute that returns a list', function(assert) {
 	var div = document.createElement('div');
 	var template = function (num) {
 		return '<label>num=</label> <span>' + num + '</span>';
@@ -212,13 +212,13 @@ test('list with a compute that returns a list', function () {
 
 	live.list(el, arrCompute, template, {});
 
-	equal(div.getElementsByTagName('label').length, 2, 'There are 2 labels');
+	assert.equal(div.getElementsByTagName('label').length, 2, 'There are 2 labels');
 	arrCompute([ 0, 1, 2 ]);
 	var spans = div.getElementsByTagName('span');
-	equal(spans.length, 3, 'there are 3 spans');
+	assert.equal(spans.length, 3, 'there are 3 spans');
 });
 
-test('text binding is memory safe (#666)', function () {
+QUnit.test('text binding is memory safe (#666)', function(assert) {
 	nodeLists.nodeMap.clear();
 
 	var div = document.createElement('div'),
@@ -232,17 +232,17 @@ test('text binding is memory safe (#666)', function () {
 
 	live.text(span, text, div);
 	domMutateNode.removeChild.call(this.fixture, div);
-	stop();
+	var done = assert.async();
 	setTimeout(function () {
-		ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
-		start();
+		assert.ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
+		done();
 	}, 100);
 });
 
-test('html live binding handles getting a function from a compute',5, function(){
+QUnit.test('html live binding handles getting a function from a compute',5, function(assert) {
 	var handler = function(el){
-		ok(true, "called handler");
-		equal(el.nodeType, 3, "got a placeholder");
+		assert.ok(true, "called handler");
+		assert.equal(el.nodeType, 3, "got a placeholder");
 	};
 
 	var div = document.createElement('div'),
@@ -261,15 +261,15 @@ test('html live binding handles getting a function from a compute',5, function()
 
 	live.html(placeholder, html, div);
 
-	equal(div.getElementsByTagName("h1").length, 1, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 1, "got h1");
 	count(1);
-	equal(div.getElementsByTagName("h1").length, 0, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 0, "got h1");
 	count(0);
-	equal(div.getElementsByTagName("h1").length, 1, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 1, "got h1");
 });
 
-test("live.list does not unbind on a list unnecessarily (#1835)", function(){
-	expect(0);
+QUnit.test("live.list does not unbind on a list unnecessarily (#1835)", function(assert) {
+	assert.expect(0);
 	var div = document.createElement('div'),
 		list = new List([
 			'sloth',
@@ -281,7 +281,7 @@ test("live.list does not unbind on a list unnecessarily (#1835)", function(){
 		unbind = list.unbind;
 
 	list.unbind = function(){
-		ok(false, "unbind called");
+		assert.ok(false, "unbind called");
 		return unbind.apply(this, arguments);
 	};
 
@@ -291,7 +291,7 @@ test("live.list does not unbind on a list unnecessarily (#1835)", function(){
 	live.list(el, list, template, {});
 });
 
-test('live.list should handle move events', function (assert) {
+QUnit.test('live.list should handle move events', function (assert) {
 	/*
 		All this test does is make sure triggering the move event
 		does not cause live.list to blow up.
@@ -315,7 +315,7 @@ test('live.list should handle move events', function (assert) {
 	assert.ok(true, 'The list should not blow up');
 });
 
-test("can.live.attr works with non-string attributes (#1790)", function() {
+QUnit.test("can.live.attr works with non-string attributes (#1790)", function(assert) {
 	var el = document.createElement('div'),
 		attrCompute = compute(function() {
 			return 2;
@@ -323,10 +323,10 @@ test("can.live.attr works with non-string attributes (#1790)", function() {
 
 	domMutateNode.setAttribute(el, "value", 1);
 	live.attr(el, 'value', attrCompute);
-	ok(true, 'No exception thrown.');
+	assert.ok(true, 'No exception thrown.');
 });
 
-test('list and an falsey section (#1979)', function () {
+QUnit.test('list and an falsey section (#1979)', function(assert) {
 	var div = document.createElement('div'),
 		template = function (num) {
 			return '<label>num=</label> <span>' + num + '</span>';
@@ -340,26 +340,26 @@ test('list and an falsey section (#1979)', function () {
 	var el = div.getElementsByTagName('span')[0];
 	live.list(el, listCompute, template, {}, undefined, undefined, falseyTemplate );
 
-	equal(div.getElementsByTagName('label').length, 2, 'There are 2 labels');
+	assert.equal(div.getElementsByTagName('label').length, 2, 'There are 2 labels');
 
 	listCompute([]);
 
 	var spans = div.getElementsByTagName('span');
-	equal(spans.length, 0, 'there are 0 spans');
+	assert.equal(spans.length, 0, 'there are 0 spans');
 
 	var ps = div.getElementsByTagName('p');
-	equal(ps.length, 1, 'there is 1 p');
+	assert.equal(ps.length, 1, 'there is 1 p');
 
 	listCompute([2]);
 
 	spans = div.getElementsByTagName('span');
-	equal(spans.length, 1, 'there is 1 spans');
+	assert.equal(spans.length, 1, 'there is 1 spans');
 
 	ps = div.getElementsByTagName('p');
-	equal(ps.length, 0, 'there is 1 p');
+	assert.equal(ps.length, 0, 'there is 1 p');
 });
 
-test('list and an initial falsey section (#1979)', function(){
+QUnit.test('list and an initial falsey section (#1979)', function(assert) {
 
 	var div = document.createElement('div'),
 		template = function (num) {
@@ -376,21 +376,21 @@ test('list and an initial falsey section (#1979)', function(){
 	live.list(el, listCompute, template, {}, undefined, undefined, falseyTemplate );
 
 	var spans = div.getElementsByTagName('span');
-	equal(spans.length, 0, 'there are 0 spans');
+	assert.equal(spans.length, 0, 'there are 0 spans');
 
 	var ps = div.getElementsByTagName('p');
-	equal(ps.length, 1, 'there is 1 p');
+	assert.equal(ps.length, 1, 'there is 1 p');
 
 	listCompute([2]);
 
 	spans = div.getElementsByTagName('span');
-	equal(spans.length, 1, 'there is 1 spans');
+	assert.equal(spans.length, 1, 'there is 1 spans');
 
 	ps = div.getElementsByTagName('p');
-	equal(ps.length, 0, 'there is 1 p');
+	assert.equal(ps.length, 0, 'there is 1 p');
 });
 
-test('rendered list items should re-render when updated (#2007)', function () {
+QUnit.test('rendered list items should re-render when updated (#2007)', function(assert) {
 	var partial = document.createElement('div');
 	var placeholderElement = document.createElement('span');
 	var list = new List([ 'foo' ]);
@@ -402,18 +402,18 @@ test('rendered list items should re-render when updated (#2007)', function () {
 
 	live.list(placeholderElement, list, renderer, {});
 
-	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'foo', 'list item 0 is foo');
+	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'foo', 'list item 0 is foo');
 
 	list.push('bar');
 
-	equal(partial.getElementsByTagName('span')[1].firstChild.data, 'bar', 'list item 1 is bar');
+	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'bar', 'list item 1 is bar');
 
 	list.attr(0, 'baz');
 
-	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'baz', 'list item 0 is baz');
+	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'baz', 'list item 0 is baz');
 });
 
-test('list items should be correct even if renderer flushes batch (#8)', function () {
+QUnit.test('list items should be correct even if renderer flushes batch (#8)', function(assert) {
 	var partial = document.createElement('div');
 	var placeholderElement = document.createElement('span');
 	var list = new List([ 'one', 'two' ]);
@@ -427,21 +427,21 @@ test('list items should be correct even if renderer flushes batch (#8)', functio
 
 	live.list(placeholderElement, list, renderer, {});
 
-	equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
-	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'one', 'list item 0 is "one"');
-	equal(partial.getElementsByTagName('span')[1].firstChild.data, 'two', 'list item 1 is "two"');
+	assert.equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
+	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'one', 'list item 0 is "one"');
+	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'two', 'list item 1 is "two"');
 
 	canBatch.start();
 	list.splice(0, 0, 'three');
 	list.splice(2, 1);
 	canBatch.stop();
 
-	equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
-	equal(partial.getElementsByTagName('span')[0].firstChild.data, 'three', 'list item 0 is "three"');
-	equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
+	assert.equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
+	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'three', 'list item 0 is "three"');
+	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
 });
 
-test('changing items in a live.list after it has been unregistered works (#55)', function() {
+QUnit.test('changing items in a live.list after it has been unregistered works (#55)', function(assert) {
 	// this test replicates the behavior of this stache template:
 	//
 	// {{#if show}}
@@ -501,10 +501,10 @@ test('changing items in a live.list after it has been unregistered works (#55)',
 	map.attr('list').replace([ 'two', 'three' ]);
 	canBatch.stop();
 
-	ok(true, 'should not throw');
+	assert.ok(true, 'should not throw');
 });
 
-QUnit.test("Works with Observations - .html", function(){
+QUnit.test("Works with Observations - .html", function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -520,13 +520,13 @@ QUnit.test("Works with Observations - .html", function(){
 		return html;
 	});
 	live.html(span, html, div);
-	equal(div.getElementsByTagName('label').length, 2);
+	assert.equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
-	equal(div.getElementsByTagName('label').length, 3);
+	assert.equal(div.getElementsByTagName('label').length, 3);
 });
 
 
-QUnit.test('Works with Observations - .list', function () {
+QUnit.test('Works with Observations - .list', function(assert) {
 	var div = document.createElement('div'),
 		map = new Map({
 			animals: [
@@ -543,15 +543,15 @@ QUnit.test('Works with Observations - .list', function () {
 	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
 	live.list(el, listObservation, template, {});
-	equal(div.getElementsByTagName('label')
+	assert.equal(div.getElementsByTagName('label')
 		.length, 2, 'There are 2 labels');
 	div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
 
 	map.attr('animals')
 		.push('turtle');
 
-	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
-	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
+	assert.equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
+	assert.equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
 
 	map.attr('animals', new List([
 		'sloth',
@@ -559,11 +559,11 @@ QUnit.test('Works with Observations - .list', function () {
 		'turtle'
 	]));
 	var spans = div.getElementsByTagName('span');
-	equal(spans.length, 3, 'there are 3 spans');
-	ok(!div.getElementsByTagName('label')[0].myexpando, 'no expando');
+	assert.equal(spans.length, 3, 'there are 3 spans');
+	assert.ok(!div.getElementsByTagName('label')[0].myexpando, 'no expando');
 });
 
-QUnit.test('Works with Observations - .attrs', function () {
+QUnit.test('Works with Observations - .attrs', function(assert) {
 	var div = document.createElement('div');
 	var items = new List([
 		'class',
@@ -577,14 +577,14 @@ QUnit.test('Works with Observations - .attrs', function () {
 		return html;
 	});
 	live.attrs(div, text);
-	equal(div.className, 'foo');
+	assert.equal(div.className, 'foo');
 	items.splice(0, 2);
-	equal(div.className, '');
+	assert.equal(div.className, '');
 	items.push('foo', 'bar');
-	equal(div.getAttribute('foo'), 'bar');
+	assert.equal(div.getAttribute('foo'), 'bar');
 });
 
-QUnit.test('Works with Observations - .attr', function(){
+QUnit.test('Works with Observations - .attr', function(assert) {
 	var div = document.createElement('div');
 
 	var firstObject = new Map({});
@@ -603,16 +603,16 @@ QUnit.test('Works with Observations - .attr', function(){
 
 	live.attr(div, 'class', className);
 
-	equal(div.className, 'foo   end');
+	assert.equal(div.className, 'foo   end');
 	firstObject.attr('selected', true);
-	equal(div.className, 'foo selected  end');
+	assert.equal(div.className, 'foo selected  end');
 	secondObject.attr('active', true);
-	equal(div.className, 'foo selected active end');
+	assert.equal(div.className, 'foo selected active end');
 	firstObject.attr('selected', false);
-	equal(div.className, 'foo  active end');
+	assert.equal(div.className, 'foo  active end');
 });
 
-QUnit.test("events are torn down from correct list on change", function() {
+QUnit.test("events are torn down from correct list on change", function(assert) {
 	var div = document.createElement('div');
 	var list = new List([1, 2, 3]);
 	var filteredList;
@@ -624,12 +624,12 @@ QUnit.test("events are torn down from correct list on change", function() {
 	var el = div.getElementsByTagName('span')[0];
 	live.list(el, c, template, {});
 
-	ok(list.__bindEvents.add && list.__bindEvents.add.length > 0, "Add handler has been added to list");
+	assert.ok(list.__bindEvents.add && list.__bindEvents.add.length > 0, "Add handler has been added to list");
 
 	c(filteredList = list.filter(function(x) {
 		return x % 2;
 	}));
 
-	ok(!list.__bindEvents.add || list.__bindEvents.add.length === 0, "Add handler has been removed from list");
-	ok(filteredList.__bindEvents.add && filteredList.__bindEvents.add.length > 0, "Add handler has been added to filteredList");
+	assert.ok(!list.__bindEvents.add || list.__bindEvents.add.length === 0, "Add handler has been removed from list");
+	assert.ok(filteredList.__bindEvents.add && filteredList.__bindEvents.add.length > 0, "Add handler has been added to filteredList");
 });

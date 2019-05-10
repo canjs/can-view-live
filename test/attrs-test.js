@@ -9,12 +9,12 @@ var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
 
 QUnit.module("can-view-live.attrs",{
-    setup: function(){
+    beforeEach: function(assert) {
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });
 
-QUnit.test('basics', function () {
+QUnit.test('basics', function(assert) {
 	var div = document.createElement('div');
     var property = new SimpleObservable("class"),
         value = new SimpleObservable("foo");
@@ -27,14 +27,14 @@ QUnit.test('basics', function () {
 		return html;
 	});
 	live.attrs(div, text);
-	equal(div.className, 'foo');
+	assert.equal(div.className, 'foo');
 	property.set(null);
-	equal(div.className, '');
+	assert.equal(div.className, '');
     queues.batch.start();
     property.set('foo');
     value.set('bar');
     queues.batch.stop();
-	equal(div.getAttribute('foo'), 'bar');
+	assert.equal(div.getAttribute('foo'), 'bar');
 });
 
 QUnit.test('should remove `removed` events listener', function (assert) {
