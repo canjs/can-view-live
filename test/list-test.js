@@ -49,13 +49,14 @@ QUnit.test('basics', function () {
 	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
 
+	// el, list, render, context, falseyRender
 	live.list(el, list, template, {});
 
 	equal(div.getElementsByTagName('label')
 		.length, 2, 'There are 2 labels');
 
     div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
-
+	queues.log();
 	list.push('turtle');
 	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
 	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
