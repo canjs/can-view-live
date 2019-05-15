@@ -31,7 +31,7 @@ function afterMutation(cb) {
 }
 
 QUnit.module("can-view-live.list",{
-	beforeEach: function(assert) {
+	beforeEach: function() {
 		this.fixture = document.getElementById("qunit-fixture");
 	}
 });

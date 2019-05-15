@@ -5,7 +5,7 @@ var Patcher = require("../lib/patcher");
 var SimpleObservable = require("can-simple-observable");
 
 QUnit.module("can-view-live patcher",{
-	beforeEach: function(assert) {
+	beforeEach: function() {
 		this.fixture = document.getElementById("qunit-fixture");
 	}
 });

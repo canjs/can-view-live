@@ -10,7 +10,7 @@ var canReflectDeps = require('can-reflect-dependencies');
 var canGlobals = require('can-globals');
 
 QUnit.module("can-view-live.text", {
-	beforeEach: function(assert) {
+	beforeEach: function() {
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });

@@ -15,7 +15,7 @@ var domMutateNode = require('can-dom-mutate/node');
 var fragment = require('can-fragment');
 
 QUnit.module('can-view-live',{
-	beforeEach: function(assert) {
+	beforeEach: function() {
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });

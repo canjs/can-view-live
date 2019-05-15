@@ -8,7 +8,7 @@ var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
 
 QUnit.module("can-view-live.attr",{
-    beforeEach: function(assert) {
+    beforeEach: function() {
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });
