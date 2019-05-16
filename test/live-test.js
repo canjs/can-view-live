@@ -239,7 +239,8 @@ QUnit.test('text binding is memory safe (#666)', function(assert) {
 	}, 100);
 });
 
-QUnit.test('html live binding handles getting a function from a compute',5, function(assert) {
+QUnit.test('html live binding handles getting a function from a compute', function(assert) {
+	assert.expect(5);
 	var handler = function(el){
 		assert.ok(true, "called handler");
 		assert.equal(el.nodeType, 3, "got a placeholder");

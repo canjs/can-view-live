@@ -34,7 +34,8 @@ QUnit.test('basics', function(assert) {
 	assert.equal(div.getElementsByTagName('label').length, 3);
 });
 
-QUnit.test('html live binding handles getting a function from a compute',5, function(assert) {
+QUnit.test('html live binding handles getting a function from a compute', function(assert) {
+	assert.expect(5);
 	var handler = function(el){
 		assert.ok(true, "called handler");
 		assert.equal(el.nodeType, 3, "got a placeholder");
@@ -84,7 +85,8 @@ QUnit.test("Works with Observations - .html", function(assert) {
 	assert.equal(div.getElementsByTagName('label').length, 3);
 });
 
-QUnit.test("html live binding handles objects with can.viewInsert symbol", 2, function(assert) {
+QUnit.test("html live binding handles objects with can.viewInsert symbol", function(assert) {
+	assert.expect(2);
 	var div = document.createElement("div");
 	var options = {};
 	var placeholder = document.createTextNode("Placeholder text");
@@ -104,7 +106,8 @@ QUnit.test("html live binding handles objects with can.viewInsert symbol", 2, fu
 	assert.equal(div.textContent, "Replaced text", "symbol function called");
 });
 
-testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", 1,function (assert){
+testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", function (assert){
+	assert.expect(1);
 	var observable = new SimpleObservable("value");
 
 	var childObservation = new Observation(function child(){

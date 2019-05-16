@@ -63,7 +63,8 @@ QUnit.test('basics', function(assert) {
 });
 
 
-QUnit.test('list within an Observation', 5, function(assert) {
+QUnit.test('list within an Observation', function(assert) {
+	assert.expect(5);
 	var div = document.createElement('div'),
 		map = new SimpleMap({
 			animals: new DefineList([
