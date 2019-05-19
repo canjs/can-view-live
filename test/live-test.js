@@ -89,12 +89,12 @@ test('attributes', function () {
 
 test('attributes - should stop listening for removal once removed', function (assert) {
 	var done = assert.async();
-	var onNodeRemoval = domMutate.onNodeRemoval;
+	var onNodeDisconnected = domMutate.onNodeDisconnected;
 
-	domMutate.onNodeRemoval = function () {
+	domMutate.onNodeDisconnected = function () {
 		assert.ok(true, 'addEventListener called');
-		var disposal = onNodeRemoval.apply(null, arguments);
-		domMutate.onNodeRemoval = onNodeRemoval;
+		var disposal = onNodeDisconnected.apply(null, arguments);
+		domMutate.onNodeDisconnected = onNodeDisconnected;
 		return function () {
 			assert.ok(true, 'disposal function was called');
 			disposal();

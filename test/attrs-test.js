@@ -39,12 +39,12 @@ QUnit.test('basics', function () {
 
 QUnit.test('should remove `removed` events listener', function (assert) {
 	var done = assert.async();
-	var onNodeRemoval = domMutate.onNodeRemoval;
+	var onNodeDisconnected = domMutate.onNodeDisconnected;
 
-	domMutate.onNodeRemoval = function () {
+	domMutate.onNodeDisconnected = function () {
 		assert.ok(true, 'addEventListener called');
-		var disposal = onNodeRemoval.apply(null, arguments);
-		domMutate.onNodeRemoval = onNodeRemoval;
+		var disposal = onNodeDisconnected.apply(null, arguments);
+		domMutate.onNodeDisconnected = onNodeDisconnected;
 		return function () {
 			assert.ok(true, 'disposal function was called');
 			disposal();
@@ -100,7 +100,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		'getDependencyDataOf(observation) should return the div as a dependency'
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
 
 		assert.equal(
@@ -119,10 +119,10 @@ if(window.document && document.contains) {
 	QUnit.test('use document contains if possible', function (assert) {
 		var done = assert.async();
 		// overwrite domMutate call
-		var onNodeRemoval = domMutate.onNodeRemoval;
-		domMutate.onNodeRemoval = function () {
-			var disposal = onNodeRemoval.apply(null, arguments);
-			domMutate.onNodeRemoval = onNodeRemoval;
+		var onNodeDisconnected = domMutate.onNodeDisconnected;
+		domMutate.onNodeDisconnected = function () {
+			var disposal = onNodeDisconnected.apply(null, arguments);
+			domMutate.onNodeDisconnected = onNodeDisconnected;
 			return function () {
 				disposal();
 				done();

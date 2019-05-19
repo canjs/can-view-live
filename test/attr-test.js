@@ -101,7 +101,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		'getDependencyDataOf(title) should return the <div> as a dependency'
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
 
 		assert.equal(

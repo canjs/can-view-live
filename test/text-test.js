@@ -4,10 +4,10 @@ var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
-var nodeLists = require('can-view-nodelist');
 var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
 var canGlobals = require('can-globals');
+var canReflect = require("can-reflect");
 
 QUnit.module("can-view-live.text", {
 	setup: function() {
@@ -34,14 +34,13 @@ QUnit.test('text', function() {
 		});
 		return html;
 	});
-	live.text(span, text, div);
+	live.text(span, text);
 	equal(div.innerHTML, esc('<label>one</label><label>two</label>'));
 	value.set(['one', 'two', 'three']);
 	equal(div.innerHTML, esc('<label>one</label><label>two</label><label>three</label>'));
 });
 
 QUnit.test('text binding is memory safe (#666)', function() {
-	nodeLists.nodeMap.clear();
 
 	var div = document.createElement('div'),
 		span = document.createElement('span'),
@@ -52,12 +51,12 @@ QUnit.test('text binding is memory safe (#666)', function() {
 
 	domMutateNode.appendChild.call(this.fixture, div);
 
-	live.text(span, text, div);
+	live.text(span, text);
 	domMutateNode.removeChild.call(this.fixture, div);
-	stop();
+	QUnit.stop();
 	setTimeout(function() {
-		ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
-		start();
+		QUnit.notOk(canReflect.isBound(text), "not bound");
+		QUnit.start();
 	}, 100);
 });
 
@@ -66,9 +65,9 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	assert.expect(3);
 
 	var div = document.createElement('div');
-	var span = document.createElement('span');
+	var placeholder = document.createTextNode("");
 
-	div.appendChild(span);
+	div.appendChild(placeholder);
 	document.body.appendChild(div);
 
 	var value = new SimpleObservable(['one', 'two']);
@@ -80,11 +79,11 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 			.join('');
 	});
 
-	live.text(span, text, div);
+	live.text(placeholder, text);
 
 	assert.deepEqual(
 		canReflectDeps
-			.getDependencyDataOf(div)
+			.getDependencyDataOf(placeholder)
 			.whatChangesMe
 			.mutate
 			.valueDependencies,
@@ -98,23 +97,24 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 			.whatIChange
 			.mutate
 			.valueDependencies,
-		new Set([div]),
-		'whatChangesMe(observation) shows the <div>'
+		new Set([placeholder]),
+		'whatChangesMe(observation) shows the PlaceHolder node'
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
+		setTimeout(function(){
+			assert.equal(
+				typeof canReflectDeps.getDependencyDataOf(placeholder),
+				'undefined',
+				'dependencies should be clear out when elements is removed'
+			);
 
-		assert.equal(
-			typeof canReflectDeps.getDependencyDataOf(div),
-			'undefined',
-			'dependencies should be clear out when elements is removed'
-		);
+			done();
+		},10)
 
-		done();
 	});
-
-	div.parentNode.removeChild(div);
+	domMutateNode.removeChild.call(div.parentNode, div);
 });
 
 QUnit.test("Removing the documentElement tears down correctly", function(assert) {
@@ -126,7 +126,7 @@ QUnit.test("Removing the documentElement tears down correctly", function(assert)
 	canGlobals.setKeyValue('document', doc);
 	var tn = doc.createTextNode("foo");
 
-	domMutate.onNodeRemoval(doc.body, function() {
+	domMutate.onNodeDisconnected(doc.body, function() {
 		canGlobals.setKeyValue('document', realDoc);
 		assert.ok(true, 'Removal fired');
 		done();
@@ -135,6 +135,6 @@ QUnit.test("Removing the documentElement tears down correctly", function(assert)
 	var text = new Observation(function() { return "foo"; });
 
 	domMutateNode.appendChild.call(doc.body, tn);
-	live.text(tn, text, doc.body);
+	live.text(tn, text);
 	domMutateNode.removeChild.call(doc, doc.documentElement);
 });

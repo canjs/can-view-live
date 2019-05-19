@@ -201,36 +201,12 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	domMutateNode.removeChild.call( div.parentNode, div);
 });
 
-QUnit.skip(".html works inside a .list (can-stache#542)", function(){
-	var div = document.createElement('div'),
-		span = document.createElement('span');
-	div.appendChild(span);
-
-
-	var content = new SimpleObservable( fragment("<p>Hello</p>") );
-
-	live.html(span, content);
-
-	// force a change, but something else will have already responded
-	queues.batch.start();
-	content.set( fragment("<span>Goodbye</span>") );
-
-	// NodeList has been updated immediately, but the DOM isn't up to date
-	queues.domUIQueue.enqueue(function(){
-		var itemNodeList = listNodeList[0];
-		QUnit.equal( div.firstChild, itemNodeList[0], "the DOM and nodeList should be in sync");
-	});
-
-	queues.batch.stop();
-});
-
 QUnit.test(".html works if it is enqueued twice", function(){
 	// enqueue in domUI right away and change again in there
 	var div = fragment("<div>PLACEHOLDER</div>").firstChild;
 	var html = new SimpleObservable(fragment("<p>1</p>"));
 
 	live.html(div.firstChild, html);
-	queues.log();
 	queues.batch.start();
 
 	queues.domUIQueue.enqueue(function setHTMLTO3(){

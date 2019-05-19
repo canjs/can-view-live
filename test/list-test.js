@@ -55,8 +55,8 @@ QUnit.test('basics', function () {
 	equal(div.getElementsByTagName('label')
 		.length, 2, 'There are 2 labels');
 
-    div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
-	queues.log();
+	div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
+
 	list.push('turtle');
 	equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
 	equal(div.getElementsByTagName('span')[2].innerHTML, 'turtle', 'turtle added');
@@ -169,7 +169,8 @@ QUnit.test('list and an falsey section (#1979)', function () {
 	var listCompute = new SimpleObservable([ 0, 1 ]);
 	div.innerHTML = 'my <b>fav</b> nums: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
-	live.list(el, listCompute, template, {}, undefined, undefined, falseyTemplate );
+	// (el, list, render, context, falseyRender)
+	live.list(el, listCompute, template, {}, falseyTemplate );
 
 	equal(div.getElementsByTagName('label').length, 2, 'There are 2 labels');
 
@@ -204,7 +205,7 @@ QUnit.test('list and an initial falsey section (#1979)', function(){
 
 	div.innerHTML = 'my <b>fav</b> nums: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
-	live.list(el, listCompute, template, {}, undefined, undefined, falseyTemplate );
+	live.list(el, listCompute, template, {}, falseyTemplate );
 
 	var spans = div.getElementsByTagName('span');
 	equal(spans.length, 0, 'there are 0 spans');
@@ -414,29 +415,33 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	};
 
 	live.list(el, list, template, {});
+	var placeholder = div.childNodes[3];
 
 	assert.deepEqual(
 		canReflectDeps
-			.getDependencyDataOf(div)
+			.getDependencyDataOf(placeholder)
 			.whatChangesMe
 			.mutate
 			.valueDependencies,
 		new Set([list])
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
+		// the div callback will run before the deep child
+		setTimeout(function(){
+			assert.equal(
+				typeof canReflectDeps.getDependencyDataOf(placeholder),
+				'undefined',
+				'dependencies should be cleared when parent node is removed'
+			);
 
-		assert.equal(
-			typeof canReflectDeps.getDependencyDataOf(div),
-			'undefined',
-			'dependencies should be cleared when parent node is removed'
-		);
+			done();
+		},10);
 
-		done();
 	});
 
-	div.parentNode.removeChild(div);
+	domMutateNode.removeChild.call(div.parentNode, div);
 });
 
 test("no memory leaks with replacements (#93)", function () {
