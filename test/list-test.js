@@ -7,7 +7,6 @@ var SimpleMap = require("can-simple-map");
 var canReflect = require("can-reflect");
 var queues = require("can-queues");
 var fragment = require('can-fragment');
-var NodeLists = require("can-view-nodelist");
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require("can-symbol");
@@ -280,10 +279,9 @@ test('changing items in a live.list after it has been unregistered works (#55)',
 
 	// set up nodelists
 	var htmlNodeList = canReflect.toArray(fragment("<div></div>").childNodes);
-	NodeLists.register(htmlNodeList, function(){}, true);
+
 
 	var listNodeList = canReflect.toArray(fragment("<div></div>").childNodes);
-	NodeLists.register(listNodeList, function(){}, htmlNodeList, true);
 
 	// set up elements
 	var listTextNode = document.createTextNode('');
@@ -444,37 +442,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	domMutateNode.removeChild.call(div.parentNode, div);
 });
 
-test("no memory leaks with replacements (#93)", function () {
 
-	var div = document.createElement('div'),
-		animals = new DefineList([
-			'bear',
-			'turtle'
-		]),
-		template = function (animal) {
-			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
-		};
-	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
-	var htmlNodeList = canReflect.toArray(div.childNodes);
-	NodeLists.register(htmlNodeList, function(){}, true);
-
-	var el = div.getElementsByTagName('span')[0];
-
-	this.fixture.appendChild(div);
-	var nodeList = [el];
-	NodeLists.register(nodeList, function(){}, htmlNodeList);
-	live.list(el, animals, template, {}, this.fixture, nodeList);
-
-	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
-
-	animals.push("foo");
-
-	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
-
-	animals.shift();
-
-	QUnit.deepEqual(nodeList.replacements, [], "no replacements");
-});
 
 
 test("Undefined list and teardown", function () {

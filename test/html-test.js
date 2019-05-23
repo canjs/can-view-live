@@ -3,7 +3,6 @@ var DefineList = require("can-define/list/list");
 var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
-var NodeLists = require("can-view-nodelist");
 var testHelpers = require('can-test-helpers');
 var domMutate = require('can-dom-mutate');
 var canReflectDeps = require('can-reflect-dependencies');
