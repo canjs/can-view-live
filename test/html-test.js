@@ -13,7 +13,7 @@ var queues = require("can-queues");
 
 QUnit.module("can-view-live.html");
 
-test('basics', function () {
+QUnit.test('basics', function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -29,15 +29,16 @@ test('basics', function () {
 		return html;
 	});
 	live.html(span, html, div);
-	equal(div.getElementsByTagName('label').length, 2);
+	assert.equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
-	equal(div.getElementsByTagName('label').length, 3);
+	assert.equal(div.getElementsByTagName('label').length, 3);
 });
 
-test('html live binding handles getting a function from a compute',5, function(){
+QUnit.test('html live binding handles getting a function from a compute', function(assert) {
+	assert.expect(5);
 	var handler = function(el){
-		ok(true, "called handler");
-		equal(el.nodeType, 3, "got a placeholder");
+		assert.ok(true, "called handler");
+		assert.equal(el.nodeType, 3, "got a placeholder");
 	};
 
 	var div = document.createElement('div'),
@@ -55,15 +56,15 @@ test('html live binding handles getting a function from a compute',5, function()
 
 	live.html(placeholder, html, div);
 
-	equal(div.getElementsByTagName("h1").length, 1, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 1, "got h1");
 	count.set(1);
-	equal(div.getElementsByTagName("h1").length, 0, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 0, "got h1");
 	count.set(0);
-	equal(div.getElementsByTagName("h1").length, 1, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 1, "got h1");
 });
 
 
-QUnit.test("Works with Observations - .html", function(){
+QUnit.test("Works with Observations - .html", function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -79,12 +80,13 @@ QUnit.test("Works with Observations - .html", function(){
 		return html;
 	});
 	live.html(span, html, div);
-	equal(div.getElementsByTagName('label').length, 2);
+	assert.equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
-	equal(div.getElementsByTagName('label').length, 3);
+	assert.equal(div.getElementsByTagName('label').length, 3);
 });
 
-test("html live binding handles objects with can.viewInsert symbol", 2, function(assert) {
+QUnit.test("html live binding handles objects with can.viewInsert symbol", function(assert) {
+	assert.expect(2);
 	var div = document.createElement("div");
 	var options = {};
 	var placeholder = document.createTextNode("Placeholder text");
@@ -104,11 +106,12 @@ test("html live binding handles objects with can.viewInsert symbol", 2, function
 	assert.equal(div.textContent, "Replaced text", "symbol function called");
 });
 
-testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", 1,function(){
+testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", function (assert){
+	assert.expect(1);
 	var observable = new SimpleObservable("value");
 
 	var childObservation = new Observation(function child(){
-		QUnit.ok(true, "called child content once");
+		assert.ok(true, "called child content once");
 		observable.get();
 		return "CHILD CONTENT";
 	},null, {priority: 1});
@@ -195,7 +198,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	div.parentNode.removeChild(div);
 });
 
-QUnit.test(".html works inside a .list (can-stache#542)", function(){
+QUnit.test(".html works inside a .list (can-stache#542)", function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -214,13 +217,13 @@ QUnit.test(".html works inside a .list (can-stache#542)", function(){
 	// NodeList has been updated immediately, but the DOM isn't up to date
 	queues.domUIQueue.enqueue(function(){
 		var itemNodeList = listNodeList[0];
-		QUnit.equal( div.firstChild, itemNodeList[0], "the DOM and nodeList should be in sync");
+		assert.equal( div.firstChild, itemNodeList[0], "the DOM and nodeList should be in sync");
 	});
 
 	queues.batch.stop();
 });
 
-QUnit.test(".html works if it is enqueued twice", function(){
+QUnit.test(".html works if it is enqueued twice", function(assert) {
 	// enqueue in domUI right away and change again in there
 	var div = fragment("<div>PLACEHOLDER</div>").firstChild;
 	var html = new SimpleObservable(fragment("<p>1</p>"));
@@ -234,9 +237,9 @@ QUnit.test(".html works if it is enqueued twice", function(){
 
 	html.set(fragment("<p>2</p>"));
 	queues.batch.stop();
-	QUnit.ok(true, "got here without an error");
+	assert.ok(true, "got here without an error");
 
-	QUnit.deepEqual(div.innerHTML.toLowerCase(), "<p>3</p>");
+	assert.deepEqual(div.innerHTML.toLowerCase(), "<p>3</p>");
 
 
 });
