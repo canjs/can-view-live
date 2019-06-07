@@ -10,7 +10,7 @@ var canGlobals = require('can-globals');
 var canReflect = require("can-reflect");
 
 QUnit.module("can-view-live.text", {
-	setup: function() {
+	beforeEach: function() {
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });
@@ -21,7 +21,7 @@ var esc = function(str) {
 		.replace(/>/g, '&gt;');
 };
 
-QUnit.test('text', function() {
+QUnit.test('text', function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -35,12 +35,12 @@ QUnit.test('text', function() {
 		return html;
 	});
 	live.text(span, text);
-	equal(div.innerHTML, esc('<label>one</label><label>two</label>'));
+	assert.equal(div.innerHTML, esc('<label>one</label><label>two</label>'));
 	value.set(['one', 'two', 'three']);
-	equal(div.innerHTML, esc('<label>one</label><label>two</label><label>three</label>'));
+	assert.equal(div.innerHTML, esc('<label>one</label><label>two</label><label>three</label>'));
 });
 
-QUnit.test('text binding is memory safe (#666)', function() {
+QUnit.test('text binding is memory safe (#666)', function(assert) {
 
 	var div = document.createElement('div'),
 		span = document.createElement('span'),
@@ -53,10 +53,10 @@ QUnit.test('text binding is memory safe (#666)', function() {
 
 	live.text(span, text);
 	domMutateNode.removeChild.call(this.fixture, div);
-	QUnit.stop();
+	var done = assert.async();
 	setTimeout(function() {
-		QUnit.notOk(canReflect.isBound(text), "not bound");
-		QUnit.start();
+		assert.notOk(canReflect.isBound(text), "not bound");
+		done();
 	}, 100);
 });
 

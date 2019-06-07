@@ -13,7 +13,7 @@ var platforms = [{
 	version: 'latest'
 }, {
 	browserName: 'Safari',
-	'appium-version': '1.7.1',
+	'appium-version': '1.9.1',
 	platformName: 'iOS',
 	platformVersion: '11.0',
 	deviceName: 'iPhone 8 Simulator'
