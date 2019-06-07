@@ -111,7 +111,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 			);
 
 			done();
-		},10)
+		},10);
 
 	});
 	domMutateNode.removeChild.call(div.parentNode, div);

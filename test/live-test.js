@@ -5,6 +5,7 @@ var List = require('can-list');
 var canBatch = require('can-event/batch/batch');
 var Observation = require("can-observation");
 var canReflect = require("can-reflect");
+var nodeLists = require("can-view-nodelist");
 
 var QUnit = require('steal-qunit');
 

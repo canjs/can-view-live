@@ -6,7 +6,6 @@ var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
 var canReflect = require("can-reflect");
 var queues = require("can-queues");
-var fragment = require('can-fragment');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require("can-symbol");
