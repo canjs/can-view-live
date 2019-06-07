@@ -50,7 +50,7 @@
     "can-attribute-observable": "<2.0.0",
     "can-child-nodes": "^1.0.0",
     "can-diff": "^1.0.1",
-    "can-dom-mutate": "^1.2.2",
+    "can-dom-mutate": "^2.0.0",
     "can-fragment": "^1.0.0",
     "can-observation": "^4.0.0",
     "can-queues": "^1.0.0",
