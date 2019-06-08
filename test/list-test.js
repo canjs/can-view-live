@@ -6,7 +6,6 @@ var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
 var canReflect = require("can-reflect");
 var queues = require("can-queues");
-var fragment = require('can-fragment');
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require("can-symbol");
@@ -19,7 +18,7 @@ var globals = require("can-globals");
 function afterMutation(cb) {
 	var doc = globals.getKeyValue('document');
 	var div = doc.createElement("div");
-	var undo = domMutate.onNodeInsertion(div, function () {
+	var undo = domMutate.onNodeConnected(div, function () {
 		undo();
 		doc.body.removeChild(div);
 		setTimeout(cb, 5);

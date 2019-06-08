@@ -1,10 +1,10 @@
 "use strict";
-var live = require("./lib/core");
-require("./lib/attr");
-require("./lib/attrs");
-require("./lib/html");
-require("./lib/list");
-require("./lib/text");
+var live = {};
+live.attr = require("./lib/attr");
+live.attrs = require("./lib/attrs");
+live.html = require("./lib/html");
+live.list = require("./lib/list");
+live.text = require("./lib/text");
 
 
 module.exports = live;
