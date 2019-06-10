@@ -8,12 +8,12 @@ var testHelpers = require('can-test-helpers');
 var canReflectDeps = require('can-reflect-dependencies');
 
 QUnit.module("can-view-live.attr",{
-    setup: function(){
+    beforeEach: function() {
 		this.fixture = document.getElementById('qunit-fixture');
 	}
 });
 
-QUnit.test('basics', function () {
+QUnit.test('basics', function(assert) {
 	var div = document.createElement('div');
 
 	var firstValue = new SimpleObservable(null);
@@ -30,24 +30,24 @@ QUnit.test('basics', function () {
 
 	live.attr(div, 'class', className);
 
-	equal(div.className, 'foo   end');
+	assert.equal(div.className, 'foo   end');
 	firstValue.set(true);
-	equal(div.className, 'foo selected  end');
+	assert.equal(div.className, 'foo selected  end');
 	secondValue.set(true);
-	equal(div.className, 'foo selected active end');
+	assert.equal(div.className, 'foo selected active end');
 	firstValue.set(false);
-	equal(div.className, 'foo  active end');
+	assert.equal(div.className, 'foo  active end');
 });
 
-QUnit.test('specialAttribute with new line', function () {
+QUnit.test('specialAttribute with new line', function(assert) {
 	var div = document.createElement('div');
 	var style = new SimpleObservable('width: 50px;\nheight:50px;');
 	live.attr(div, 'style', style);
-	equal(div.style.height, '50px');
-	equal(div.style.width, '50px');
+	assert.equal(div.style.height, '50px');
+	assert.equal(div.style.width, '50px');
 });
 
-QUnit.test("can.live.attr works with non-string attributes (#1790)", function() {
+QUnit.test("can.live.attr works with non-string attributes (#1790)", function(assert) {
 	var el = document.createElement('div'),
 		attrCompute = new Observation(function() {
 			return 2;
@@ -55,7 +55,7 @@ QUnit.test("can.live.attr works with non-string attributes (#1790)", function() 
 
 	domMutateNode.setAttribute.call(el, "value", 1);
 	live.attr(el, 'value', attrCompute);
-	ok(true, 'No exception thrown.');
+	assert.ok(true, 'No exception thrown.');
 });
 
 testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
@@ -117,19 +117,19 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	domMutateNode.removeChild.call( div.parentNode, div);
 });
 
-QUnit.test("can.live.attr works with value (#96)", function() {
+QUnit.test("can.live.attr works with value (#96)", function(assert) {
 	var el = document.createElement('input'),
 		attrObservable = new SimpleObservable("Hello");
 
 	live.attr(el, 'value', attrObservable);
-	equal(el.value, "Hello", "Hello");
+	assert.equal(el.value, "Hello", "Hello");
 
 	attrObservable.set("Hi");
-	equal(el.value, "Hi", "Hi");
+	assert.equal(el.value, "Hi", "Hi");
 
 	el.value = "Hey";
-	equal(el.value, "Hey", "Hey");
+	assert.equal(el.value, "Hey", "Hey");
 
 	attrObservable.set("Aloha");
-	equal(el.value, "Aloha", "Aloha");
+	assert.equal(el.value, "Aloha", "Aloha");
 });

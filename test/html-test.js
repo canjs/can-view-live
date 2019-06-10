@@ -13,7 +13,7 @@ var domMutateNode = require("can-dom-mutate/node/node");
 
 QUnit.module("can-view-live.html");
 
-QUnit.test('basics', function () {
+QUnit.test('basics', function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 
@@ -31,15 +31,16 @@ QUnit.test('basics', function () {
 		return html;
 	});
 	live.html(span, html);
-	equal(div.getElementsByTagName('label').length, 2);
+	assert.equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
-	equal(div.getElementsByTagName('label').length, 3);
+	assert.equal(div.getElementsByTagName('label').length, 3);
 });
 
-test('html live binding handles getting a function from a compute',5, function(){
+QUnit.test('html live binding handles getting a function from a compute', function(assert) {
+	assert.expect(5);
 	var handler = function(el){
-		ok(true, "called handler");
-		equal(el.nodeType, 3, "got a placeholder");
+		assert.ok(true, "called handler");
+		assert.equal(el.nodeType, 3, "got a placeholder");
 	};
 
 	var div = document.createElement('div'),
@@ -57,15 +58,15 @@ test('html live binding handles getting a function from a compute',5, function()
 
 	live.html(placeholder, html);
 
-	equal(div.getElementsByTagName("h1").length, 1, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 1, "got h1");
 	count.set(1);
-	equal(div.getElementsByTagName("h1").length, 0, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 0, "got h1");
 	count.set(0);
-	equal(div.getElementsByTagName("h1").length, 1, "got h1");
+	assert.equal(div.getElementsByTagName("h1").length, 1, "got h1");
 });
 
 
-QUnit.test("Works with Observations - .html", function(){
+QUnit.test("Works with Observations - .html", function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
 	div.appendChild(span);
@@ -81,12 +82,13 @@ QUnit.test("Works with Observations - .html", function(){
 		return html;
 	});
 	live.html(span, html, div);
-	equal(div.getElementsByTagName('label').length, 2);
+	assert.equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
-	equal(div.getElementsByTagName('label').length, 3);
+	assert.equal(div.getElementsByTagName('label').length, 3);
 });
 
-test("html live binding handles objects with can.viewInsert symbol", 2, function(assert) {
+QUnit.test("html live binding handles objects with can.viewInsert symbol", function(assert) {
+	assert.expect(2);
 	var div = document.createElement("div");
 	var options = {};
 	var placeholder = document.createTextNode("Placeholder text");
@@ -106,12 +108,13 @@ test("html live binding handles objects with can.viewInsert symbol", 2, function
 	assert.equal(div.textContent, "Replaced text", "symbol function called");
 });
 
-testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", 1,function(){
+testHelpers.dev.devOnlyTest("child elements must disconnect before parents can re-evaluate", function (assert){
+	assert.expect(1);
 	var observable = new SimpleObservable("value");
 
 	// this observation should run once ...
 	var childObservation = new Observation(function child(){
-		QUnit.ok(true, "called child content once");
+		assert.ok(true, "called child content once");
 		observable.get();
 		return "CHILD CONTENT";
 	});
@@ -200,7 +203,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	domMutateNode.removeChild.call( div.parentNode, div);
 });
 
-QUnit.test(".html works if it is enqueued twice", function(){
+QUnit.test(".html works if it is enqueued twice", function(assert) {
 	// enqueue in domUI right away and change again in there
 	var div = fragment("<div>PLACEHOLDER</div>").firstChild;
 	var html = new SimpleObservable(fragment("<p>1</p>"));
@@ -218,10 +221,9 @@ QUnit.test(".html works if it is enqueued twice", function(){
 
 	html.set(frag2);
 	queues.batch.stop();
+	assert.ok(true, "got here without an error");
 
-	QUnit.ok(true, "got here without an error");
-
-	QUnit.deepEqual(div.querySelector("p").textContent, "3");
+	assert.deepEqual(div.querySelector("p").textContent, "3");
 
 
 });
