@@ -40,7 +40,7 @@ QUnit.test('html live binding handles getting a function from a compute', functi
 	assert.expect(5);
 	var handler = function(el){
 		assert.ok(true, "called handler");
-		assert.equal(el.nodeType, Node.COMMENT_NODE, "got a placeholder");
+		assert.equal(el.nodeType, 3, "got a placeholder");
 	};
 
 	var div = document.createElement('div'),
