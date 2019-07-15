@@ -58,10 +58,9 @@
     "can-reflect-dependencies": "^1.0.1",
     "can-simple-observable": "^2.0.0",
     "can-symbol": "^1.4.1",
-    "can-view-callbacks": "^4.0.0",
-    "can-view-nodelist": "^4.3.3",
+    "can-view-callbacks": "canjs/can-view-callbacks#major",
     "can-view-parser": "^4.0.0",
-    "can-view-target": "^4.0.0"
+    "can-view-target": "canjs/can-view-target#major"
   },
   "devDependencies": {
     "can-define": "^2.0.0",

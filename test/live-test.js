@@ -5,7 +5,6 @@ var List = require('can-list');
 var canBatch = require('can-event/batch/batch');
 var Observation = require("can-observation");
 var canReflect = require("can-reflect");
-var nodeLists = require("can-view-nodelist");
 
 var QUnit = require('steal-qunit');
 
@@ -218,26 +217,6 @@ QUnit.test('list with a compute that returns a list', function(assert) {
 	assert.equal(spans.length, 3, 'there are 3 spans');
 });
 
-QUnit.skip('text binding is memory safe (#666)', function (assert) {
-	nodeLists.nodeMap.clear();
-
-	var div = document.createElement('div'),
-		span = document.createElement('span'),
-		text = compute(function () {
-			return 'foo';
-		});
-	div.appendChild(span);
-
-	domMutateNode.appendChild.call(this.fixture, div);
-
-	live.text(span, text, div);
-	domMutateNode.removeChild.call(this.fixture, div);
-	var done = assert.async();
-	setTimeout(function () {
-		assert.ok(!nodeLists.nodeMap.size, 'nothing in nodeMap');
-		done();
-	}, 100);
-});
 
 QUnit.test('html live binding handles getting a function from a compute', function(assert) {
 	assert.expect(5);
@@ -457,7 +436,7 @@ QUnit.skip('changing items in a live.list after it has been unregistered works (
 	//	show = false;
 	//	list.replace(...);
 	//	canBatch.stop();
-	var map = new Map({
+	/*var map = new Map({
 		show: true,
 		list: [ 'one' ]
 	});
@@ -502,7 +481,7 @@ QUnit.skip('changing items in a live.list after it has been unregistered works (
 	map.attr('list').replace([ 'two', 'three' ]);
 	canBatch.stop();
 
-	assert.ok(true, 'should not throw');
+	assert.ok(true, 'should not throw');*/
 });
 
 QUnit.test("Works with Observations - .html", function(assert) {
