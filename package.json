@@ -1,6 +1,6 @@
 {
   "name": "can-view-live",
-  "version": "4.2.8",
+  "version": "5.0.0-pre.0",
   "description": "",
   "homepage": "https://canjs.com/doc/can-view-live.html",
   "repository": {
@@ -47,10 +47,10 @@
     ]
   },
   "dependencies": {
-    "can-attribute-observable": "<2.0.0",
+    "can-attribute-observable": "canjs/can-attribute-observable#major",
     "can-child-nodes": "^1.0.0",
     "can-diff": "canjs/can-diff#patch-sort",
-    "can-dom-mutate": "canjs/can-dom-mutate#onNodeRemoved",
+    "can-dom-mutate": "^2.0.0",
     "can-fragment": "^1.0.0",
     "can-observation": "canjs/can-observation#dom-queue",
     "can-queues": "canjs/can-queues#dom-queue",
