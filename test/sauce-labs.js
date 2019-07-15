@@ -19,7 +19,7 @@ var platforms = [{
 	deviceName: 'iPhone 8 Simulator'
 }, {
 	browserName: 'safari',
-	platform: 'OS X 10.12',
+	platform: 'OS X 10.13',
 	version: 'latest'
 }, {
 	browserName: 'googlechrome',
