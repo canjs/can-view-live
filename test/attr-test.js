@@ -71,6 +71,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	live.attr(div, 'id', id);
 	live.attr(div, 'title', title);
 
+
 	assert.deepEqual(
 		canReflectDeps
 			.getDependencyDataOf(div)
@@ -80,6 +81,8 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		new Set([id, title]),
 		'getDependencyDataOf(<div>) should return the two SimpleObservables as dependencies'
 	);
+	console.log(canReflectDeps
+		.getDependencyDataOf(id))
 
 	assert.deepEqual(
 		canReflectDeps

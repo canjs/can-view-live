@@ -60,7 +60,8 @@
     "can-symbol": "^1.4.1",
     "can-view-callbacks": "canjs/can-view-callbacks#major",
     "can-view-parser": "^4.0.0",
-    "can-view-target": "canjs/can-view-target#major"
+    "can-view-target": "canjs/can-view-target#major",
+	"can-event-queue": "canjs/can-event-queue#dom-queue"
   },
   "devDependencies": {
     "can-define": "^2.0.0",

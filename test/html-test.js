@@ -211,11 +211,11 @@ QUnit.test(".html works if it is enqueued twice", function(assert) {
 	live.html(div.firstChild, html);
 	queues.batch.start();
 
-	queues.domUIQueue.enqueue(function setHTMLTO3(){
+	queues.domQueue.enqueue(function setHTMLTO3(){
 		var frag3 = fragment("<p>3</p>");
 		frag3.ID = 3;
 		html.set(frag3);
-	},null,[]);
+	},null,[],{element: div.firstChild});
 	var frag2 = fragment("<p>2</p>");
 	frag2.ID = 2;
 
