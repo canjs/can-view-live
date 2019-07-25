@@ -49,7 +49,7 @@
   "dependencies": {
     "can-attribute-observable": "canjs/can-attribute-observable#major",
     "can-child-nodes": "^1.0.0",
-    "can-diff": "canjs/can-diff#patch-sort",
+    "can-diff": "^1.5.0",
     "can-dom-mutate": "^2.0.0",
     "can-fragment": "^1.0.0",
     "can-observation": "canjs/can-observation#dom-queue",
