@@ -224,6 +224,53 @@ QUnit.test(".html works if it is enqueued twice", function(assert) {
 	assert.ok(true, "got here without an error");
 
 	assert.deepEqual(div.querySelector("p").textContent, "3");
+});
 
+QUnit.test("tearing down a .html inside another .html works", function(assert) {
+	// this test replicates the behavior of
+	//
+	// {{#if(person)}}
+	//   {{person}}
+	// {{/if}}
+	//
+	// where person is a getter like:
+	//
+	// get person() {
+	//   if (this.showPerson) {
+	//     return "Matt";
+	//   }
+	// }
+	var showPerson = new SimpleObservable(true);
 
+	var personObservation = new Observation(function() {
+		return showPerson.value ? "Matt" : undefined;
+	});
+
+	var personFrag = document.createDocumentFragment();
+	var personTextNode = document.createTextNode('');
+	personFrag.appendChild(personTextNode);
+
+	// {{person}}
+	live.html(personTextNode, personObservation, personFrag);
+
+	var ifPersonObservation = new Observation(function() {
+		return personObservation.value ? personFrag : undefined;
+	});
+
+	var ifPersonFrag = document.createDocumentFragment();
+	var ifPersonTextNode = document.createTextNode('');
+	ifPersonFrag.appendChild(ifPersonTextNode);
+
+	// {{#if(person)}}
+	live.html(ifPersonTextNode, ifPersonObservation, ifPersonFrag);
+
+	// <!-- if(person) --> <!-- person --> "Matt"  <!-- /if(person) --> <!-- /person -->
+	assert.deepEqual(ifPersonFrag.childNodes.length, 5, "initial nodes correct");
+	assert.deepEqual(ifPersonFrag.childNodes[2].textContent, "Matt", "initial text node correct");
+
+	showPerson.value = false;
+
+	// <!-- if(person) --> "" <!-- /person -->
+	assert.deepEqual(ifPersonFrag.childNodes.length, 3, "nodes torn down correctly");
+	assert.deepEqual(ifPersonFrag.childNodes[1].textContent, "", "placeholder text node correct");
 });
