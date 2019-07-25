@@ -4,14 +4,14 @@ var Map = require('can-map');
 var List = require('can-list');
 var canBatch = require('can-event/batch/batch');
 var Observation = require("can-observation");
-var canReflect = require("can-reflect");
+// var canReflect = require("can-reflect");
 
 var QUnit = require('steal-qunit');
 
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 
-var fragment = require('can-fragment');
+// var fragment = require('can-fragment');
 
 QUnit.module('can-view-live',{
 	beforeEach: function() {
@@ -421,7 +421,7 @@ QUnit.test('list items should be correct even if renderer flushes batch (#8)', f
 	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
 });
 
-QUnit.skip('changing items in a live.list after it has been unregistered works (#55)', function(assert) {
+QUnit.skip('changing items in a live.list after it has been unregistered works (#55)', function(/*assert*/) {
 	// this test replicates the behavior of this stache template:
 	//
 	// {{#if show}}

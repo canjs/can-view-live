@@ -82,7 +82,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		'getDependencyDataOf(<div>) should return the two SimpleObservables as dependencies'
 	);
 	console.log(canReflectDeps
-		.getDependencyDataOf(id))
+		.getDependencyDataOf(id));
 
 	assert.deepEqual(
 		canReflectDeps
