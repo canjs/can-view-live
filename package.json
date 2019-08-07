@@ -47,7 +47,7 @@
     ]
   },
   "dependencies": {
-    "can-attribute-observable": "canjs/can-attribute-observable#major",
+    "can-attribute-observable": "^2.0.0-pre.0",
     "can-child-nodes": "^1.0.0",
     "can-diff": "^1.5.0",
     "can-dom-mutate": "^2.0.0",
@@ -58,9 +58,9 @@
     "can-reflect-dependencies": "^1.0.1",
     "can-simple-observable": "^2.0.0",
     "can-symbol": "^1.4.1",
-    "can-view-callbacks": "canjs/can-view-callbacks#major",
+    "can-view-callbacks": "^5.0.0-pre.1",
     "can-view-parser": "^4.0.0",
-    "can-view-target": "canjs/can-view-target#major"
+    "can-view-target": "^5.0.0-pre.0"
   },
   "devDependencies": {
     "can-define": "^2.0.0",
