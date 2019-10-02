@@ -3,24 +3,26 @@ var DefineList = require("can-define/list/list");
 var Observation = require("can-observation");
 var QUnit = require('steal-qunit');
 var SimpleObservable = require("can-simple-observable");
-var NodeLists = require("can-view-nodelist");
 var testHelpers = require('can-test-helpers');
 var domMutate = require('can-dom-mutate');
 var canReflectDeps = require('can-reflect-dependencies');
 var canSymbol = require('can-symbol');
 var fragment = require("can-fragment");
 var queues = require("can-queues");
+var domMutateNode = require("can-dom-mutate/node/node");
 
 QUnit.module("can-view-live.html");
 
 QUnit.test('basics', function(assert) {
 	var div = document.createElement('div'),
 		span = document.createElement('span');
+
 	div.appendChild(span);
 	var items = new DefineList([
 		'one',
 		'two'
 	]);
+
 	var html = new Observation(function itemsHTML() {
 		var html = '';
 		items.forEach(function (item) {
@@ -28,7 +30,7 @@ QUnit.test('basics', function(assert) {
 		});
 		return html;
 	});
-	live.html(span, html, div);
+	live.html(span, html);
 	assert.equal(div.getElementsByTagName('label').length, 2);
 	items.push('three');
 	assert.equal(div.getElementsByTagName('label').length, 3);
@@ -38,7 +40,7 @@ QUnit.test('html live binding handles getting a function from a compute', functi
 	assert.expect(5);
 	var handler = function(el){
 		assert.ok(true, "called handler");
-		assert.equal(el.nodeType, 3, "got a placeholder");
+		assert.equal(el.nodeType, Node.COMMENT_NODE, "got a placeholder");
 	};
 
 	var div = document.createElement('div'),
@@ -54,7 +56,7 @@ QUnit.test('html live binding handles getting a function from a compute', functi
 		}
 	});
 
-	live.html(placeholder, html, div);
+	live.html(placeholder, html);
 
 	assert.equal(div.getElementsByTagName("h1").length, 1, "got h1");
 	count.set(1);
@@ -101,7 +103,7 @@ QUnit.test("html live binding handles objects with can.viewInsert symbol", funct
 		return d;
 	});
 
-	live.html(placeholder, html, div, options);
+	live.html(placeholder, html, options);
 
 	assert.equal(div.textContent, "Replaced text", "symbol function called");
 });
@@ -110,44 +112,43 @@ testHelpers.dev.devOnlyTest("child elements must disconnect before parents can r
 	assert.expect(1);
 	var observable = new SimpleObservable("value");
 
+	// this observation should run once ...
 	var childObservation = new Observation(function child(){
 		assert.ok(true, "called child content once");
 		observable.get();
 		return "CHILD CONTENT";
-	},null, {priority: 1});
+	});
 
-	var htmlNodeList= [];
-
+	// PARENT OBSERVATION ... should be notified and teardown CHILD OBSERVATION
 	var parentObservation = new Observation(function parent(){
 		var result = observable.get();
 		if(result === "value") {
 			var childTextNode = document.createTextNode('');
 			var childFrag = document.createDocumentFragment();
 			childFrag.appendChild(childTextNode);
-			var nodeList = [childTextNode];
 
-			NodeLists.register(nodeList, null, htmlNodeList, true);
-			live.html(childTextNode, childObservation, null, nodeList);
+			// CHILD OBSERVATION
+			live.html(childTextNode, childObservation);
+
 			return childFrag;
 		} else {
 			return "NEW CONTENT";
 		}
-	},null,{priority: 0});
+	});
 
 	var parentTextNode = document.createTextNode('');
 	var div = document.createElement('div');
+	//document.body.appendChild(div);
 	div.appendChild(parentTextNode);
-	htmlNodeList.push(parentTextNode);
 
-	NodeLists.register(htmlNodeList, function(){}, true, true);
-	live.html(parentTextNode, parentObservation, div, htmlNodeList);
+	//window.queues = queues;
 
+	live.html(parentTextNode, parentObservation);
+	//queues.log("flush");
 	observable.set("VALUE");
 });
 
 testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
-
-	
 
 	var done = assert.async();
 	assert.expect(3);
@@ -158,14 +159,15 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	div.appendChild(span);
 	document.body.appendChild(div);
 
-	var html = new Observation(function() {
+	var html = new Observation(function simpleHello() {
 		return '<p>Hello</p>';
 	});
-	live.html(span, html, div);
+	live.html(span, html);
+
 
 	assert.deepEqual(
 		canReflectDeps
-			.getDependencyDataOf(div)
+			.getDependencyDataOf(div.firstChild)
 			.whatChangesMe
 			.mutate
 			.valueDependencies,
@@ -179,48 +181,26 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 			.whatIChange
 			.derive
 			.valueDependencies,
-		new Set([div]),
+		new Set([div.firstChild]),
 		'whatChangesMe(<observation>) shows the div'
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
+		setTimeout(function(){
 
-		assert.equal(
-			typeof canReflectDeps.getDependencyDataOf(div),
-			'undefined',
-			'dependencies should be clear out when elements is removed'
-		);
 
-		done();
+			assert.equal(
+				typeof canReflectDeps.getDependencyDataOf(div.firstChild),
+				'undefined',
+				'dependencies should be clear out when elements is removed'
+			);
+
+			done();
+		},20);
 	});
-
-	div.parentNode.removeChild(div);
-});
-
-QUnit.test(".html works inside a .list (can-stache#542)", function(assert) {
-	var div = document.createElement('div'),
-		span = document.createElement('span');
-	div.appendChild(span);
-
-	var itemNodeList = NodeLists.register([span]);
-	var listNodeList = NodeLists.register([itemNodeList]);
-
-
-	var content = new SimpleObservable( fragment("<p>Hello</p>") );
-
-	live.html(span, content, div, itemNodeList);
-
-	// force a change, but something else will have already responded
-	queues.batch.start();
-	content.set( fragment("<span>Goodbye</span>") );
-	// NodeList has been updated immediately, but the DOM isn't up to date
-	queues.domUIQueue.enqueue(function(){
-		var itemNodeList = listNodeList[0];
-		assert.equal( div.firstChild, itemNodeList[0], "the DOM and nodeList should be in sync");
-	});
-
-	queues.batch.stop();
+	// TODO: check this again once domMutate is able to work with normal add / remove
+	domMutateNode.removeChild.call( div.parentNode, div);
 });
 
 QUnit.test(".html works if it is enqueued twice", function(assert) {
@@ -228,18 +208,69 @@ QUnit.test(".html works if it is enqueued twice", function(assert) {
 	var div = fragment("<div>PLACEHOLDER</div>").firstChild;
 	var html = new SimpleObservable(fragment("<p>1</p>"));
 
-	live.html(div.firstChild, html, div);
-
+	live.html(div.firstChild, html);
 	queues.batch.start();
-	queues.domUIQueue.enqueue(function setHTMLTO3(){
-		html.set(fragment("<p>3</p>"));
-	},null,[]);
 
-	html.set(fragment("<p>2</p>"));
+	queues.domQueue.enqueue(function setHTMLTO3(){
+		var frag3 = fragment("<p>3</p>");
+		frag3.ID = 3;
+		html.set(frag3);
+	},null,[],{element: div.firstChild});
+	var frag2 = fragment("<p>2</p>");
+	frag2.ID = 2;
+
+	html.set(frag2);
 	queues.batch.stop();
 	assert.ok(true, "got here without an error");
 
-	assert.deepEqual(div.innerHTML.toLowerCase(), "<p>3</p>");
+	assert.deepEqual(div.querySelector("p").textContent, "3");
+});
 
+QUnit.test("tearing down a .html inside another .html works", function(assert) {
+	// this test replicates the behavior of
+	//
+	// {{#if(person)}}
+	//   {{person}}
+	// {{/if}}
+	//
+	// where person is a getter like:
+	//
+	// get person() {
+	//   if (this.showPerson) {
+	//     return "Matt";
+	//   }
+	// }
+	var showPerson = new SimpleObservable(true);
 
+	var personObservation = new Observation(function() {
+		return showPerson.value ? "Matt" : undefined;
+	});
+
+	var personFrag = document.createDocumentFragment();
+	var personTextNode = document.createTextNode('');
+	personFrag.appendChild(personTextNode);
+
+	// {{person}}
+	live.html(personTextNode, personObservation, personFrag);
+
+	var ifPersonObservation = new Observation(function() {
+		return personObservation.value ? personFrag : undefined;
+	});
+
+	var ifPersonFrag = document.createDocumentFragment();
+	var ifPersonTextNode = document.createTextNode('');
+	ifPersonFrag.appendChild(ifPersonTextNode);
+
+	// {{#if(person)}}
+	live.html(ifPersonTextNode, ifPersonObservation, ifPersonFrag);
+
+	// <!-- if(person) --> <!-- person --> "Matt"  <!-- /if(person) --> <!-- /person -->
+	assert.deepEqual(ifPersonFrag.childNodes.length, 5, "initial nodes correct");
+	assert.deepEqual(ifPersonFrag.childNodes[2].textContent, "Matt", "initial text node correct");
+
+	showPerson.value = false;
+
+	// <!-- if(person) --> "" <!-- /person -->
+	assert.deepEqual(ifPersonFrag.childNodes.length, 3, "nodes torn down correctly");
+	assert.deepEqual(ifPersonFrag.childNodes[1].textContent, "", "placeholder text node correct");
 });

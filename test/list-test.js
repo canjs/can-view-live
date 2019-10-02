@@ -6,8 +6,6 @@ var SimpleObservable = require("can-simple-observable");
 var SimpleMap = require("can-simple-map");
 var canReflect = require("can-reflect");
 var queues = require("can-queues");
-var fragment = require('can-fragment');
-var NodeLists = require("can-view-nodelist");
 var domMutate = require('can-dom-mutate');
 var domMutateNode = require('can-dom-mutate/node');
 var canSymbol = require("can-symbol");
@@ -20,7 +18,7 @@ var globals = require("can-globals");
 function afterMutation(cb) {
 	var doc = globals.getKeyValue('document');
 	var div = doc.createElement("div");
-	var undo = domMutate.onNodeInsertion(div, function () {
+	var undo = domMutate.onNodeConnected(div, function () {
 		undo();
 		doc.body.removeChild(div);
 		setTimeout(cb, 5);
@@ -49,12 +47,13 @@ QUnit.test('basics', function(assert) {
 	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
 
+	// el, list, render, context, falseyRender
 	live.list(el, list, template, {});
 
 	assert.equal(div.getElementsByTagName('label')
 		.length, 2, 'There are 2 labels');
 
-    div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
+	div.getElementsByTagName('label')[0].myexpando = 'EXPANDO-ED';
 
 	list.push('turtle');
 	assert.equal(div.getElementsByTagName('label')[0].myexpando, 'EXPANDO-ED', 'same expando');
@@ -169,7 +168,8 @@ QUnit.test('list and an falsey section (#1979)', function(assert) {
 	var listCompute = new SimpleObservable([ 0, 1 ]);
 	div.innerHTML = 'my <b>fav</b> nums: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
-	live.list(el, listCompute, template, {}, undefined, undefined, falseyTemplate );
+	// (el, list, render, context, falseyRender)
+	live.list(el, listCompute, template, {}, falseyTemplate );
 
 	assert.equal(div.getElementsByTagName('label').length, 2, 'There are 2 labels');
 
@@ -204,7 +204,7 @@ QUnit.test('list and an initial falsey section (#1979)', function(assert) {
 
 	div.innerHTML = 'my <b>fav</b> nums: <span></span> !';
 	var el = div.getElementsByTagName('span')[0];
-	live.list(el, listCompute, template, {}, undefined, undefined, falseyTemplate );
+	live.list(el, listCompute, template, {}, falseyTemplate );
 
 	var spans = div.getElementsByTagName('span');
 	assert.equal(spans.length, 0, 'there are 0 spans');
@@ -253,74 +253,6 @@ QUnit.test('list items should be correct even if renderer flushes batch (#8)', f
 	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'three', 'list item 0 is "three"');
 	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
 });
-
-
-
-
-QUnit.test('changing items in a live.list after it has been unregistered works (#55)', function(assert) {
-	// this test replicates the behavior of this stache template:
-	//
-	// {{#if show}}
-	//		{{#each list}}
-	//			{{.}}
-	//		{{/each}}
-	//	{{/if}}
-	//
-	//	and this code:
-	//
-	//	canBatch.start();
-	//	show = false;
-	//	list.replace(...);
-	//	canBatch.stop();
-	var map = new SimpleMap({
-		show: true,
-		list: new DefineList([ 'one' ])
-	});
-
-	// set up nodelists
-	var htmlNodeList = canReflect.toArray(fragment("<div></div>").childNodes);
-	NodeLists.register(htmlNodeList, function(){}, true);
-
-	var listNodeList = canReflect.toArray(fragment("<div></div>").childNodes);
-	NodeLists.register(listNodeList, function(){}, htmlNodeList, true);
-
-	// set up elements
-	var listTextNode = document.createTextNode('');
-	var listFrag = document.createDocumentFragment();
-	listFrag.appendChild(listTextNode);
-
-	var htmlTextNode = document.createTextNode('');
-	var div = document.createElement('div');
-	div.appendChild(htmlTextNode);
-
-	// create live.list for `{{#each list}}`
-	var listObs = new Observation(function list() {
-		return map.attr('list');
-	},{priority: 2});
-	var listRenderer = function(item) {
-		// must use an Observation as the live.list "compute"
-		// Observation.prototype.get() will trigger a canBatch.flush() (if observation is bound)
-		// which will cause the listNodeList to be unregistered
-		Observation.temporarilyBind(item);
-		return item.get();
-	};
-	live.list(listTextNode, listObs, listRenderer, map, listTextNode.parentNode, listNodeList);
-
-	// create live.html for `{{#if show}}`
-	var htmlObservation = new Observation(function if_show_html() {
-		return map.attr('show') ? listFrag : undefined;
-	},{priority: 1});
-
-	live.html(htmlTextNode, htmlObservation, htmlTextNode.parentNode, htmlNodeList);
-
-	queues.batch.start();
-	map.attr('show', false);
-	map.attr('list').replace([ 'two', 'three' ]);
-	queues.batch.stop();
-
-	assert.ok(true, 'should not throw');
-});
-
 
 QUnit.test('Works with Observations - .list', function(assert) {
 	var div = document.createElement('div'),
@@ -414,62 +346,36 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	};
 
 	live.list(el, list, template, {});
+	var placeholder = div.childNodes[3];
 
 	assert.deepEqual(
 		canReflectDeps
-			.getDependencyDataOf(div)
+			.getDependencyDataOf(placeholder)
 			.whatChangesMe
 			.mutate
 			.valueDependencies,
 		new Set([list])
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
+		// the div callback will run before the deep child
+		setTimeout(function(){
+			assert.equal(
+				typeof canReflectDeps.getDependencyDataOf(placeholder),
+				'undefined',
+				'dependencies should be cleared when parent node is removed'
+			);
 
-		assert.equal(
-			typeof canReflectDeps.getDependencyDataOf(div),
-			'undefined',
-			'dependencies should be cleared when parent node is removed'
-		);
+			done();
+		},10);
 
-		done();
 	});
 
-	div.parentNode.removeChild(div);
+	domMutateNode.removeChild.call(div.parentNode, div);
 });
 
-QUnit.test("no memory leaks with replacements (#93)", function(assert) {
 
-	var div = document.createElement('div'),
-		animals = new DefineList([
-			'bear',
-			'turtle'
-		]),
-		template = function (animal) {
-			return '<label>Animal=</label> <span>' + animal.get() + '</span>';
-		};
-	div.innerHTML = 'my <b>fav</b> animals: <span></span> !';
-	var htmlNodeList = canReflect.toArray(div.childNodes);
-	NodeLists.register(htmlNodeList, function(){}, true);
-
-	var el = div.getElementsByTagName('span')[0];
-
-	this.fixture.appendChild(div);
-	var nodeList = [el];
-	NodeLists.register(nodeList, function(){}, htmlNodeList);
-	live.list(el, animals, template, {}, this.fixture, nodeList);
-
-	assert.deepEqual(nodeList.replacements, [], "no replacements");
-
-	animals.push("foo");
-
-	assert.deepEqual(nodeList.replacements, [], "no replacements");
-
-	animals.shift();
-
-	assert.deepEqual(nodeList.replacements, [], "no replacements");
-});
 
 
 QUnit.test("Undefined list and teardown", function(assert) {

@@ -39,12 +39,12 @@ QUnit.test('basics', function(assert) {
 
 QUnit.test('should remove `removed` events listener', function (assert) {
 	var done = assert.async();
-	var onNodeRemoval = domMutate.onNodeRemoval;
+	var onNodeRemoved = domMutate.onNodeRemoved;
 
-	domMutate.onNodeRemoval = function () {
+	domMutate.onNodeRemoved = function () {
 		assert.ok(true, 'addEventListener called');
-		var disposal = onNodeRemoval.apply(null, arguments);
-		domMutate.onNodeRemoval = onNodeRemoval;
+		var disposal = onNodeRemoved.apply(null, arguments);
+		domMutate.onNodeRemoved = onNodeRemoved;
 		return function () {
 			assert.ok(true, 'disposal function was called');
 			disposal();
@@ -100,7 +100,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		'getDependencyDataOf(observation) should return the div as a dependency'
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
 
 		assert.equal(
@@ -112,36 +112,5 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		done();
 	});
 
-	div.parentNode.removeChild(div);
+	domMutateNode.removeChild.call(div.parentNode, div);
 });
-
-if(window.document && document.contains) {
-	QUnit.test('use document contains if possible', function (assert) {
-		var done = assert.async();
-		// overwrite domMutate call
-		var onNodeRemoval = domMutate.onNodeRemoval;
-		domMutate.onNodeRemoval = function () {
-			var disposal = onNodeRemoval.apply(null, arguments);
-			domMutate.onNodeRemoval = onNodeRemoval;
-			return function () {
-				disposal();
-				done();
-			};
-		};
-		// overwrite document.contains
-		var contains = document.contains;
-		document.contains = function(){
-			assert.ok(true, "contains was called");
-			var result = contains.apply(this, arguments);
-			document.contains = contains;
-			return result;
-		};
-
-		var div = document.createElement('div');
-		var text = new SimpleObservable('hello');
-
-		domMutateNode.appendChild.call(this.fixture, div);
-		live.attrs(div, text);
-		domMutateNode.removeChild.call(this.fixture, div);
-	});
-}

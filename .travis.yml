@@ -5,7 +5,7 @@ before_script:
   - sleep 2
 script: npm run ci
 addons:
-  firefox: '53.0'
+  firefox: latest
   sauce_connect: true
 dist: xenial
 services:

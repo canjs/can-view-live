@@ -71,6 +71,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	live.attr(div, 'id', id);
 	live.attr(div, 'title', title);
 
+
 	assert.deepEqual(
 		canReflectDeps
 			.getDependencyDataOf(div)
@@ -80,12 +81,14 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		new Set([id, title]),
 		'getDependencyDataOf(<div>) should return the two SimpleObservables as dependencies'
 	);
+	console.log(canReflectDeps
+		.getDependencyDataOf(id));
 
 	assert.deepEqual(
 		canReflectDeps
 			.getDependencyDataOf(id)
 			.whatIChange
-			.derive
+			.mutate
 			.valueDependencies,
 		new Set([div]),
 		'getDependencyDataOf(id) should return the <div> as a dependency'
@@ -95,13 +98,13 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		canReflectDeps
 			.getDependencyDataOf(title)
 			.whatIChange
-			.derive
+			.mutate
 			.valueDependencies,
 		new Set([div]),
 		'getDependencyDataOf(title) should return the <div> as a dependency'
 	);
 
-	var undo = domMutate.onNodeRemoval(div, function checkTeardown () {
+	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {
 		undo();
 
 		assert.equal(
@@ -114,7 +117,7 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 	});
 
 	// remove element from the DOM
-	div.parentNode.removeChild(div);
+	domMutateNode.removeChild.call( div.parentNode, div);
 });
 
 QUnit.test("can.live.attr works with value (#96)", function(assert) {
