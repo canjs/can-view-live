@@ -179,10 +179,10 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 		canReflectDeps
 			.getDependencyDataOf(html)
 			.whatIChange
-			.derive
+			.mutate
 			.valueDependencies,
 		new Set([div.firstChild]),
-		'whatChangesMe(<observation>) shows the div'
+		'whatIChange(<observation>) shows the div'
 	);
 
 	var undo = domMutate.onNodeDisconnected(div, function checkTeardown () {

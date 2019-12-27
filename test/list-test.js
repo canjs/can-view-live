@@ -254,6 +254,76 @@ QUnit.test('list items should be correct even if renderer flushes batch (#8)', f
 	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
 });
 
+QUnit.test('can insert at multiple list indexes when flusing batch (#150)', function(assert) {
+	var partial = document.createElement('div');
+	var placeholderElement = document.createElement('span');
+	var list = new DefineList([ 'one', 'two' ]);
+	var renderer = function(item) {
+		// batches can be flushed in renderers (such as those using helpers like `#each`)
+        // though this should VERY rarely happen
+        // this should NEVER happen anymore because notify is always fired immediately ... there's no "flush"
+        // that gets passed the update queue
+		queues.flush();
+		return '<span>' + item.get() + '</span>';
+	};
+
+	partial.appendChild(placeholderElement);
+
+	live.list(placeholderElement, list, renderer, {});
+
+	assert.equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
+	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'one', 'list item 0 is "one"');
+	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'two', 'list item 1 is "two"');
+
+	queues.batch.start();
+	list.splice(0, 0, 'zero'); // add 0 at the start
+	list.splice(2, 0, 'one and a half'); // remove one as
+	list.splice(4, 0, 'three'); // add 3 in position 4
+
+    queues.batch.stop();
+
+	assert.equal(partial.getElementsByTagName('span').length, 5, 'should be five items');
+	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'zero', 'list item 0 is "zero"');
+	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one', 'list item 1 is "one"');
+	assert.equal(partial.getElementsByTagName('span')[2].firstChild.data, 'one and a half', 'list item 1 is "one"');
+	assert.equal(partial.getElementsByTagName('span')[3].firstChild.data, 'two', 'list item 0 is "two"');
+	assert.equal(partial.getElementsByTagName('span')[4].firstChild.data, 'three', 'list item 1 is "three"');
+});
+
+QUnit.test('can remove and insert at multiple list indexes when flusing batch', function(assert) {
+	var partial = document.createElement('div');
+	var placeholderElement = document.createElement('span');
+	var list = new DefineList([ 'one', 'two' ]);
+	var renderer = function(item) {
+		// batches can be flushed in renderers (such as those using helpers like `#each`)
+        // though this should VERY rarely happen
+        // this should NEVER happen anymore because notify is always fired immediately ... there's no "flush"
+        // that gets passed the update queue
+		queues.flush();
+		return '<span>' + item.get() + '</span>';
+	};
+
+	partial.appendChild(placeholderElement);
+
+	live.list(placeholderElement, list, renderer, {});
+
+	assert.equal(partial.getElementsByTagName('span').length, 2, 'should be two items');
+	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'one', 'list item 0 is "one"');
+	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'two', 'list item 1 is "two"');
+
+	queues.batch.start();
+	list.splice(0, 0, 'zero'); // add 0 at the start
+	list.splice(1, 1, 'one and a half'); // remove one as
+	list.splice(2, 1, 'three'); // add 3 in position 4
+
+    queues.batch.stop();
+
+	assert.equal(partial.getElementsByTagName('span').length, 3, 'should be three items');
+	assert.equal(partial.getElementsByTagName('span')[0].firstChild.data, 'zero', 'list item 0 is "zero"');
+	assert.equal(partial.getElementsByTagName('span')[1].firstChild.data, 'one and a half', 'list item 1 is "one"');
+	assert.equal(partial.getElementsByTagName('span')[2].firstChild.data, 'three', 'list item 1 is "three"');
+});
+
 QUnit.test('Works with Observations - .list', function(assert) {
 	var div = document.createElement('div'),
 		map = new SimpleMap({
