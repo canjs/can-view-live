@@ -15,6 +15,18 @@ QUnit.module("can-view-live.text", {
 	}
 });
 
+var	afterMutation = function(cb) {
+		var doc = canGlobals.getKeyValue("document");
+		var div = doc.createElement("div");
+		var insertionDisposal = domMutate.onNodeInsertion(div, function(){
+			insertionDisposal();
+			doc.body.removeChild(div);
+			setTimeout(cb, 5);
+		});
+		setTimeout(function(){
+			domMutateNode.appendChild.call(doc.body, div);
+		}, 10);
+	};
 
 var esc = function(str) {
 	return str.replace(/</g, '&lt;')
@@ -115,6 +127,47 @@ testHelpers.dev.devOnlyTest('can-reflect-dependencies', function(assert) {
 
 	});
 	domMutateNode.removeChild.call(div.parentNode, div);
+});
+
+QUnit.test('Live binding is restored when the text node is reconnected', function(assert) {
+	var done = assert.async();
+
+	var div = document.createElement('div'),
+		textNode = document.createTextNode('');
+	this.fixture.appendChild(div);
+	div.appendChild(textNode);
+	var value = new SimpleObservable('one');
+	live.text(textNode, value);
+	assert.equal(div.innerHTML, 'one');
+	// case 1:  don't run teardown due to synchronous reconnection
+	div.appendChild(textNode);
+
+	afterMutation(function() {
+		value.set('two');
+
+		assert.equal(div.innerHTML, 'two');
+
+		// case 2:  teardown, then set up again after mutations.
+		div.removeChild(textNode);
+
+		afterMutation(function() {
+			// live binding is off while the node is disconnected.
+			value.set('three');
+			assert.equal(textNode.nodeValue, 'two');
+			div.appendChild(textNode);
+
+			afterMutation(function() {
+				// value is recomputed on reconnection.
+				assert.equal(div.innerHTML, 'three');
+
+				// live binding continues after reconnected.
+				value.set('four');
+				assert.equal(div.innerHTML, 'four');
+
+				done();
+			})
+		});
+	});
 });
 
 QUnit.test("Removing the documentElement tears down correctly", function(assert) {

@@ -10,8 +10,22 @@ var canSymbol = require('can-symbol');
 var fragment = require("can-fragment");
 var queues = require("can-queues");
 var domMutateNode = require("can-dom-mutate/node/node");
+var canGlobals = require("can-globals");
 
 QUnit.module("can-view-live.html");
+
+var	afterMutation = function(cb) {
+		var doc = canGlobals.getKeyValue("document");
+		var div = doc.createElement("div");
+		var insertionDisposal = domMutate.onNodeInsertion(div, function(){
+			insertionDisposal();
+			doc.body.removeChild(div);
+			setTimeout(cb, 5);
+		});
+		setTimeout(function(){
+			domMutateNode.appendChild.call(doc.body, div);
+		}, 10);
+	};
 
 QUnit.test('basics', function(assert) {
 	var div = document.createElement('div'),
@@ -273,4 +287,46 @@ QUnit.test("tearing down a .html inside another .html works", function(assert) {
 	// <!-- if(person) --> "" <!-- /person -->
 	assert.deepEqual(ifPersonFrag.childNodes.length, 3, "nodes torn down correctly");
 	assert.deepEqual(ifPersonFrag.childNodes[1].textContent, "", "placeholder text node correct");
+});
+
+QUnit.test('Live binding is restored when the placeholder is reconnected', function(assert) {
+	var done = assert.async();
+
+	var div = document.createElement('div'),
+		span = document.createElement('span');
+	document.getElementById("qunit-fixture").appendChild(div);
+
+	div.appendChild(span);
+	var items = new DefineList([
+		'one',
+		'two'
+	]);
+
+	var html = new Observation(function itemsHTML() {
+		var html = '';
+		items.forEach(function (item) {
+			html += '<label>' + item + '</label>';
+		});
+		return html;
+	});
+	live.html(span, html);
+	assert.equal(div.getElementsByTagName('label').length, 2);
+	var commentChildren = Array.from(div.childNodes).filter(function(node) {
+		return node.nodeType === Node.COMMENT_NODE;
+	});
+	div.removeChild(commentChildren[0]);
+	div.removeChild(commentChildren[1]);
+
+	afterMutation(function() {
+		items.push('three');
+
+		div.insertBefore(commentChildren[0], div.firstChild);
+		div.appendChild(commentChildren[1]);
+
+		afterMutation(function() {
+			console.log(	document.getElementById("qunit-fixture").innerHTML);
+			assert.equal(div.getElementsByTagName('label').length, 3);
+			done();
+		})
+	});
 });
