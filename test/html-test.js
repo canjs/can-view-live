@@ -327,6 +327,6 @@ QUnit.test('Live binding is restored when the placeholder is reconnected', funct
 			console.log(	document.getElementById("qunit-fixture").innerHTML);
 			assert.equal(div.getElementsByTagName('label').length, 3);
 			done();
-		})
+		});
 	});
 });

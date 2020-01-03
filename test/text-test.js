@@ -165,7 +165,7 @@ QUnit.test('Live binding is restored when the text node is reconnected', functio
 				assert.equal(div.innerHTML, 'four');
 
 				done();
-			})
+			});
 		});
 	});
 });
