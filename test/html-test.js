@@ -311,7 +311,7 @@ QUnit.test('Live binding is restored when the placeholder is reconnected', funct
 	});
 	live.html(span, html);
 	assert.equal(div.getElementsByTagName('label').length, 2);
-	var commentChildren = Array.from(div.childNodes).filter(function(node) {
+	var commentChildren = [].slice.call(div.childNodes, 0).filter(function(node) {
 		return node.nodeType === Node.COMMENT_NODE;
 	});
 	div.removeChild(commentChildren[0]);
