@@ -3,15 +3,14 @@
  * @module {{}} can-view-live can-view-live	
  * @parent can-views	
  * @collection can-infrastructure	
- * @package ../package.json	
+ * @package ./package.json	
  *	
  * Setup live-binding between the DOM and a compute manually.	
  *	
  * @option {Object} An object with the live-binding methods:	
  * [can-view-live.html], [can-view-live.list], [can-view-live.text], and	
  * [can-view-live.attr].	
- *	
- * @release 2.0.4	
+ *
  *	
  * @body	
  *	
