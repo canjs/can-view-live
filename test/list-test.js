@@ -170,7 +170,7 @@ QUnit.test("live.list should handle move patches", function (assert) {
 });
 
 QUnit.test(
-	"onPatches should only check for type === 'move' and ignore incompatible types",
+	"onPatches should ignore incompatible types",
 	function (assert) {
 		var parent = document.createElement("div");
 		var child = document.createElement("div");
@@ -190,11 +190,13 @@ QUnit.test(
 		};
 
 		live.list(child, list, template, {});
-
+		list.splice(0, 0, "h"); 
+		list.splice(0, 0, "g"); 
 		queues.batch.start();
 		onPatchesHandler([
 			{ type: "move", fromIndex: 0, toIndex: 2 },
-			{ type: "slice", insert: ["1"], index: 0, deleteCount: 0 },
+			{ type: "splice", insert: ["1"], index: 0, deleteCount: 0 },
+			{ type: "slice", insert: ["2"], index: 0, deleteCount: 0 },
 			{ type: "move", fromIndex: 0, toIndex: 1 },
 		]);
 		queues.batch.stop();
@@ -204,8 +206,7 @@ QUnit.test(
 			.map(function (span) {
 				return span.innerHTML;
 			});
-		console.log("values", values);
-		assert.deepEqual(values, ["c", "b", "a"]);
+		assert.deepEqual(values, ["1", "2", "b", "c", "a"]);
 	}
 );
 
