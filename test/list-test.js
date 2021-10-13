@@ -156,6 +156,44 @@ QUnit.test('live.list should handle move patches', function (assert) {
     assert.deepEqual(values, ["b","a","c"]);
 });
 
+QUnit.test(
+  "onPatches should ignore incompatible types (#160)",
+  function (assert) {
+    var parent = document.createElement("div");
+    var child = document.createElement("div");
+    parent.appendChild(child);
+
+    var onPatchesHandler;
+    var list = ["a", "b", "c"];
+    canReflect.assignSymbols(list, {
+      "can.onPatches": function (handler) {
+        console.log("handler", handler);
+        onPatchesHandler = handler;
+      },
+    });
+
+    var template = function (num) {
+      return "<span>" + num.get() + "</span>";
+    };
+
+    live.list(child, list, template, {});
+    queues.batch.start();
+    onPatchesHandler([
+      { type: "move", fromIndex: 0, toIndex: 2 },
+      { type: "splice", insert: ["1"], index: 0, deleteCount: 0 },
+      { type: "move", fromIndex: 0, toIndex: 1 },
+    ]);
+    queues.batch.stop();
+
+    var values = canReflect
+      .toArray(parent.getElementsByTagName("span"))
+      .map(function (span) {
+        return span.innerHTML;
+      });
+    assert.deepEqual(values, ["b", "1", "c", "a"]);
+  }
+);
+
 QUnit.test('list and an falsey section (#1979)', function(assert) {
 	var div = document.createElement('div'),
 		template = function (num) {
